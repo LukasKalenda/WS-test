@@ -43,21 +43,11 @@ function initializeComponents() {
             hledatFirmu(ic);
         }
     });
-
-    // Inicializace Mapy.cz
-    if (typeof Loader !== 'undefined') {
-        Loader.load(null, null, function() {
-            console.log('Mapy.cz loaded');
-            initAddressSuggestions();
-        });
-    } else {
-        console.error('Loader for Mapy.cz not found');
-    }
 }
 
 async function hledatFirmu(ic) {
     try {
-        const response = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ic}`);
+        const response = await fetch(`/.netlify/functions/ares-proxy?ic=${ic}`);
         if (!response.ok) {
             throw new Error('Firma nebyla nalezena');
         }
@@ -117,4 +107,21 @@ function initAddressSuggestions() {
             adresaSuggestions.classList.add('hidden');
         }
     });
+}
+
+function initMapyCZ() {
+    if (typeof Loader !== 'undefined') {
+        Loader.load(null, null, function() {
+            console.log('Mapy.cz loaded');
+            initAddressSuggestions();
+        });
+    } else {
+        console.error('Loader for Mapy.cz not found');
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMapyCZ);
+} else {
+    initMapyCZ();
 }
