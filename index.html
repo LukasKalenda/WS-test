@@ -1,22 +1,14 @@
 <!DOCTYPE html>
 <html lang="cs">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulář pro zákazníky</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
-    <link href="/output.css" rel="stylesheet">
-    <script src="https://api.mapy.cz/loader.js"></script>
-    <script>
-        Loader.load(null, null, function() {
-            console.log("Mapy.cz API načteno");
-            initAddressSuggestions();
-        });
-    </script>
+    <script src="https://api.mapy.cz/loader.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/datepicker.min.js" defer></script>
 </head>
-
 <body class="bg-gray-100 min-h-screen p-8">
     <section class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
         <h1 class="text-2xl font-bold mb-6 text-center">Formulář pro zákazníky</h1>
@@ -94,26 +86,11 @@
         </form>
     </section>
 
-    <section class="mt-20 bg-white shadow-md p-4 pl-6">
-        <ul class="list-disc">
-            <li>U adresy může být automatické doplňování (jako při zásilkových službách)</li>
-            <li><b>IČ</b> API z Aresu</li>
-            <li>Propojení termínu z kalendářem - </li>
-            <li>Platební systém - </li>
-            <li>Kategorizace IT problému, popřípadě jiné</li>
-            <li>Výběr zaměstance</li>
-        </ul>
-        <hr class="h-0.5 mt-3" />
-        <span class="font-bold">Možná rozšíření</span>
-        <ul class="list-disc">
-            <li>Registrace/přihlášení klienta -> nemusí zadávat údaje, pouze nahlásí novou událost</li>
-        </ul>
-    </section>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/datepicker.min.js"></script>
-    <script src="https://api.mapy.cz/loader.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    function initializeApp() {
+        console.log('Initializing app');
+
+        try {
             const btnDomacnost = document.getElementById('btnDomacnost');
             const btnFirma = document.getElementById('btnFirma');
             const firmaPole = document.getElementById('firmaPole');
@@ -125,7 +102,6 @@
             btnDomacnost.addEventListener('click', function() {
                 firmaPole.classList.add('hidden');
                 icInput.removeAttribute('required');
-                hledatICBtn.classList.add('hidden');
                 btnDomacnost.classList.remove('bg-gray-300', 'text-gray-700');
                 btnDomacnost.classList.add('bg-blue-500', 'text-white');
                 btnFirma.classList.remove('bg-blue-500', 'text-white');
@@ -135,7 +111,6 @@
             btnFirma.addEventListener('click', function() {
                 firmaPole.classList.remove('hidden');
                 icInput.setAttribute('required', '');
-                hledatICBtn.classList.remove('hidden');
                 btnFirma.classList.remove('bg-gray-300', 'text-gray-700');
                 btnFirma.classList.add('bg-blue-500', 'text-white');
                 btnDomacnost.classList.remove('bg-blue-500', 'text-white');
@@ -216,10 +191,30 @@
                 });
             }
 
-            // Načtení Mapy.cz API a inicializace našeptávání adres
-            Loader.load(null, null, initAddressSuggestions);
-        });
+            // Initialize Mapy.cz
+            if (typeof Loader !== 'undefined') {
+                Loader.load(null, null, function() {
+                    console.log('Mapy.cz loaded');
+                    initAddressSuggestions();
+                });
+            } else {
+                console.error('Loader for Mapy.cz not found');
+            }
+
+        } catch (error) {
+            console.error('Error during initialization:', error);
+        }
+    }
+
+    // Try to initialize on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+    // Fallback to window load event if DOMContentLoaded fails
+    window.addEventListener('load', function() {
+        if (typeof initializeApp === 'function') {
+            initializeApp();
+        }
+    });
     </script>
 </body>
-
 </html>
