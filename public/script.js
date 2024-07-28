@@ -3,6 +3,16 @@ document.addEventListener("DOMContentLoaded", function () {
   initializeComponents();
 });
 
+document.getElementById('cas').addEventListener('change', function() {
+  const warningElement = document.getElementById('evening-warning');
+  if (this.value === '18:00-20:00' || this.value === '20:00-23:59') {
+      warningElement.textContent = "Práce ve večerních a nočních hodinách jsou účtovány vyšší hodinovou sazbou dle ceníku.";
+      warningElement.classList.remove('hidden');
+  } else {
+      warningElement.classList.add('hidden');
+  }
+});
+
 function initializeComponents() {
   console.log("Initializing components");
 
@@ -27,23 +37,27 @@ function initializeComponents() {
     return;
   }
 
-  btnDomacnost.addEventListener("click", function () {
-    firmaPole.classList.add("hidden");
-    icInput.removeAttribute("required");
-    btnDomacnost.classList.remove("bg-gray-300", "text-gray-700");
-    btnDomacnost.classList.add("bg-blue-500", "text-white");
-    btnFirma.classList.remove("bg-blue-500", "text-white");
-    btnFirma.classList.add("bg-gray-300", "text-gray-700");
-  });
+  btnDomacnost.addEventListener('click', function() {
+    firmaPole.classList.add('hidden');
+    nazevSpolecnostiPole.classList.add('hidden');
+    dicPole.classList.add('hidden');
+    icInput.removeAttribute('required');
+    btnDomacnost.classList.remove('bg-gray-300', 'text-gray-700');
+    btnDomacnost.classList.add('bg-blue-500', 'text-white');
+    btnFirma.classList.remove('bg-blue-500', 'text-white');
+    btnFirma.classList.add('bg-gray-300', 'text-gray-700');
+});
 
-  btnFirma.addEventListener("click", function () {
-    firmaPole.classList.remove("hidden");
-    icInput.setAttribute("required", "");
-    btnFirma.classList.remove("bg-gray-300", "text-gray-700");
-    btnFirma.classList.add("bg-blue-500", "text-white");
-    btnDomacnost.classList.remove("bg-blue-500", "text-white");
-    btnDomacnost.classList.add("bg-gray-300", "text-gray-700");
-  });
+btnFirma.addEventListener('click', function() {
+    firmaPole.classList.remove('hidden');
+    nazevSpolecnostiPole.classList.remove('hidden');
+    dicPole.classList.remove('hidden');
+    icInput.setAttribute('required', '');
+    btnFirma.classList.remove('bg-gray-300', 'text-gray-700');
+    btnFirma.classList.add('bg-blue-500', 'text-white');
+    btnDomacnost.classList.remove('bg-blue-500', 'text-white');
+    btnDomacnost.classList.add('bg-gray-300', 'text-gray-700');
+});
 
   hledatICBtn.addEventListener("click", function () {
     const ic = icInput.value;
@@ -54,25 +68,26 @@ function initializeComponents() {
 }
 
 async function hledatFirmu(ic) {
-    console.log('Hledání firmy s IČ:', ic);
-    try {
+  console.log('Hledání firmy s IČ:', ic);
+  try {
       const response = await fetch(`/.netlify/functions/ares-proxy?ic=${ic}`);
       console.log('ARES proxy response status:', response.status);
       if (!response.ok) {
-        throw new Error('Firma nebyla nalezena');
+          throw new Error('Firma nebyla nalezena');
       }
       const data = await response.json();
       console.log('ARES data:', data);
       
-      document.getElementById('jmeno').value = data.obchodniJmeno || '';
+      document.getElementById('nazevSpolecnosti').value = data.obchodniJmeno || '';
       document.getElementById('adresa').value = `${data.sidlo.ulice} ${data.sidlo.cisloDomovni}, ${data.sidlo.obec}, ${data.sidlo.psc}`;
+      document.getElementById('dic').value = data.dic || 'Není plátce DPH';
       
       alert('Údaje firmy byly úspěšně načteny');
-    } catch (error) {
+  } catch (error) {
       console.error('Chyba při hledání firmy:', error);
       alert('Nepodařilo se načíst údaje firmy. Zkontrolujte IČ a zkuste to znovu.');
-    }
   }
+}
 
 function initAddressSuggestions() {
   const adresaInput = document.getElementById("adresa");
