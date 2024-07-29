@@ -64,33 +64,6 @@ function initializeComponents() {
     initAddressSuggestions();
 }
 
-async function hledatFirmu(ic) {
-    console.log('Hledání firmy s IČ:', ic);
-    try {
-        const response = await fetch(`/.netlify/functions/api-proxy?path=ares&ic=${ic}`);
-        console.log('ARES proxy response status:', response.status);
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Firma nebyla nalezena');
-        }
-        const data = await response.json();
-        console.log('ARES data:', data);
-        
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        
-        document.getElementById('nazevSpolecnosti').value = data.obchodniJmeno || '';
-        document.getElementById('adresa').value = `${data.sidlo.ulice} ${data.sidlo.cisloDomovni}, ${data.sidlo.obec}, ${data.sidlo.psc}`;
-        document.getElementById('dic').value = data.dic || 'Není plátce DPH';
-        
-        alert('Údaje firmy byly úspěšně načteny');
-    } catch (error) {
-        console.error('Chyba při hledání firmy:', error);
-        alert(`Nepodařilo se načíst údaje firmy: ${error.message}`);
-    }
-}
-
 async function fetchWithErrorHandling(url) {
     const response = await fetch(url);
     if (!response.ok) {
@@ -109,11 +82,10 @@ async function fetchWithErrorHandling(url) {
     }
 }
 
-// V funkci hledatFirmu:
 async function hledatFirmu(ic) {
     console.log('Hledání firmy s IČ:', ic);
     try {
-        const data = await fetchWithErrorHandling(`/.netlify/functions/api-proxy?path=ares&ic=${ic}`);
+        const data = await fetchWithErrorHandling(`/api/api-proxy?path=ares&ic=${ic}`);
         console.log('ARES data:', data);
         
         if (data.error) {
@@ -131,7 +103,6 @@ async function hledatFirmu(ic) {
     }
 }
 
-// V funkci initAddressSuggestions:
 function initAddressSuggestions() {
     console.log('Initializing address suggestions');
 
@@ -145,7 +116,7 @@ function initAddressSuggestions() {
             const query = this.value;
             if (query.length > 2) {
                 try {
-                    const data = await fetchWithErrorHandling(`/.netlify/functions/api-proxy?path=mapy&query=${encodeURIComponent(query)}`);
+                    const data = await fetchWithErrorHandling(`/api/api-proxy?path=mapy&query=${encodeURIComponent(query)}`);
                     adresaSuggestions.innerHTML = '';
                     if (data.result && data.result.length > 0) {
                         data.result.forEach(item => {
