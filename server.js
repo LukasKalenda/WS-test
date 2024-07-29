@@ -1,6 +1,7 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -28,7 +29,7 @@ app.get('/api/mapy', async (req, res) => {
     return res.status(400).json({ error: 'Chybí dotaz' });
   }
   try {
-    const url = `https://api.mapy.cz/v1/suggest?apiKey=9XaTSz3fWU_yHEXdZpBT9O0CjTUlfvn7fO8iGEVGaT8&query=${encodeURIComponent(query)}&type=street&limit=5&bounds=48.5370786,12.0921668|51.0746358,18.8927040`;
+    const url = `https://api.mapy.cz/v1/suggest?apiKey=9XaTSz3fWU_yHEXdZpBT9O0Cj&query=${encodeURIComponent(query)}&type=street&limit=5&bounds=48.5370786,12.0921668|51.0746358,18.8927040`;
     const response = await fetch(url);
     const data = await response.json();
     res.json(data);
@@ -36,6 +37,11 @@ app.get('/api/mapy', async (req, res) => {
     console.error('Error fetching Mapy.cz data:', error);
     res.status(500).json({ error: 'Chyba při získávání dat z Mapy.cz' });
   }
+});
+
+// Zajistí, že SPA router bude fungovat
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(port, () => {
