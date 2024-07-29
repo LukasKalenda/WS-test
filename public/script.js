@@ -1,6 +1,9 @@
+let currentStep = 1;
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded event fired');
     initializeComponents();
+    setupMultiStepForm();
 });
 
 function initializeComponents() {
@@ -64,6 +67,37 @@ function initializeComponents() {
     initAddressSuggestions();
 }
 
+function setupMultiStepForm() {
+    const form = document.getElementById('zakaznikForm');
+    const nextButton = document.getElementById('nextButton');
+    const submitButton = document.getElementById('submitButton');
+    const tosCheckbox = document.getElementById('tosCheckbox');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+
+    nextButton.addEventListener('click', async function(e) {
+        e.preventDefault();
+        if (validateStep1()) {
+            currentStep = 2;
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+            await createInvoiceNinjaClient();
+        }
+    });
+
+    tosCheckbox.addEventListener('change', function() {
+        submitButton.disabled = !this.checked;
+    });
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (currentStep === 2 && tosCheckbox.checked) {
+            const paymentLink = await getPaymentLink();
+            window.location.href = paymentLink;
+        }
+    });
+}
+
 async function fetchWithErrorHandling(url) {
     const response = await fetch(url);
     if (!response.ok) {
@@ -116,7 +150,9 @@ function initAddressSuggestions() {
             const query = this.value;
             if (query.length > 2) {
                 try {
-                    const data = await fetchWithErrorHandling(`/api/mapy?query=${encodeURIComponent(query)}`);
+                    const url = `https://api.mapy.cz/v1/suggest?apiKey=9XaTSz3fWU_yHEXdZpBT9O0Cj&query=${encodeURIComponent(query)}&type=street&limit=5&bounds=48.5370786,12.0921668|51.0746358,18.8927040`;
+                    const response = await fetch(url);
+                    const data = await response.json();
                     adresaSuggestions.innerHTML = '';
                     if (data.result && data.result.length > 0) {
                         data.result.forEach(item => {
@@ -148,4 +184,22 @@ function initAddressSuggestions() {
             adresaSuggestions.classList.add('hidden');
         }
     });
+}
+
+function validateStep1() {
+    // Implement your validation logic here
+    return true; // Return false if validation fails
+}
+
+async function createInvoiceNinjaClient() {
+    // Implement the logic to create a client in Invoice Ninja
+    console.log('Creating client in Invoice Ninja');
+    // You would typically make an API call to Invoice Ninja here
+}
+
+async function getPaymentLink() {
+    // Implement the logic to get a payment link from Invoice Ninja/Stripe
+    console.log('Getting payment link');
+    // You would typically make an API call to Invoice Ninja or Stripe here
+    return 'https://example.com/payment'; // Replace with actual payment link
 }

@@ -6,6 +6,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
+app.use(express.json());
 app.use(express.static('public'));
 
 app.get('/api/ares', async (req, res) => {
@@ -23,20 +24,46 @@ app.get('/api/ares', async (req, res) => {
   }
 });
 
-app.get('/api/mapy', async (req, res) => {
-  const { query } = req.query;
-  if (!query) {
-    return res.status(400).json({ error: 'Chybí dotaz' });
-  }
-  try {
-    const url = `https://api.mapy.cz/v1/suggest?apiKey=9XaTSz3fWU_yHEXdZpBT9O0Cj&query=${encodeURIComponent(query)}&type=street&limit=5&bounds=48.5370786,12.0921668|51.0746358,18.8927040`;
-    const response = await fetch(url);
-    const data = await response.json();
-    res.json(data);
-  } catch (error) {
-    console.error('Error fetching Mapy.cz data:', error);
-    res.status(500).json({ error: 'Chyba při získávání dat z Mapy.cz' });
-  }
+app.post('/api/create-invoice', async (req, res) => {
+    try {
+        // Vytvoření klienta v Invoice Ninja
+        const clientResponse = await fetch('https://your-invoice-ninja-url/api/v1/clients', {
+            method: 'POST',
+            headers: {
+                'X-API-TOKEN': 'your-invoice-ninja-api-token',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req.body)
+        });
+        const clientData = await clientResponse.json();
+
+        // Vytvoření faktury
+        const invoiceResponse = await fetch('https://your-invoice-ninja-url/api/v1/invoices', {
+            method: 'POST',
+            headers: {
+                'X-API-TOKEN': 'your-invoice-ninja-api-token',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                client_id: clientData.data.id,
+                items: [{ cost: 200, notes: 'Záloha' }]
+            })
+        });
+        const invoiceData = await invoiceResponse.json();
+
+        // Získání platebního odkazu
+        const paymentLinkResponse = await fetch(`https://your-invoice-ninja-url/api/v1/invoices/${invoiceData.data.id}/payment_link`, {
+            headers: {
+                'X-API-TOKEN': 'your-invoice-ninja-api-token'
+            }
+        });
+        const paymentLinkData = await paymentLinkResponse.json();
+
+        res.json({ paymentLink: paymentLinkData.data });
+    } catch (error) {
+        console.error('Error creating invoice:', error);
+        res.status(500).json({ error: 'Failed to create invoice' });
+    }
 });
 
 // Zajistí, že SPA router bude fungovat
