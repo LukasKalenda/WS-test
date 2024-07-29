@@ -91,6 +91,47 @@ async function hledatFirmu(ic) {
     }
 }
 
+async function fetchWithErrorHandling(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        const text = await response.text();
+        console.error('API Error response:', text);
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+        return response.json();
+    } else {
+        const text = await response.text();
+        console.error('Unexpected response type:', contentType);
+        console.error('Response text:', text);
+        throw new Error('Unexpected response type from server');
+    }
+}
+
+// V funkci hledatFirmu:
+async function hledatFirmu(ic) {
+    console.log('Hledání firmy s IČ:', ic);
+    try {
+        const data = await fetchWithErrorHandling(`/.netlify/functions/api-proxy?path=ares&ic=${ic}`);
+        console.log('ARES data:', data);
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        document.getElementById('nazevSpolecnosti').value = data.obchodniJmeno || '';
+        document.getElementById('adresa').value = `${data.sidlo.ulice} ${data.sidlo.cisloDomovni}, ${data.sidlo.obec}, ${data.sidlo.psc}`;
+        document.getElementById('dic').value = data.dic || 'Není plátce DPH';
+        
+        alert('Údaje firmy byly úspěšně načteny');
+    } catch (error) {
+        console.error('Chyba při hledání firmy:', error);
+        alert(`Nepodařilo se načíst údaje firmy: ${error.message}`);
+    }
+}
+
+// V funkci initAddressSuggestions:
 function initAddressSuggestions() {
     console.log('Initializing address suggestions');
 
@@ -104,14 +145,10 @@ function initAddressSuggestions() {
             const query = this.value;
             if (query.length > 2) {
                 try {
-                    const response = await fetch(`/.netlify/functions/api-proxy?path=mapy&query=${encodeURIComponent(query)}`);
-                    if (!response.ok) {
-                        throw new Error('Nepovedlo se načíst návrhy adres');
-                    }
-                    const data = await response.json();
+                    const data = await fetchWithErrorHandling(`/.netlify/functions/api-proxy?path=mapy&query=${encodeURIComponent(query)}`);
                     adresaSuggestions.innerHTML = '';
-                    if (data.length > 0) {
-                        data.forEach(item => {
+                    if (data.result && data.result.length > 0) {
+                        data.result.forEach(item => {
                             const div = document.createElement('div');
                             div.textContent = item.title;
                             div.classList.add('p-2', 'hover:bg-gray-100', 'cursor-pointer');
