@@ -85,7 +85,7 @@ async function fetchWithErrorHandling(url) {
 async function hledatFirmu(ic) {
     console.log('Hledání firmy s IČ:', ic);
     try {
-        const data = await fetchWithErrorHandling(`/api/api-proxy?path=ares&ic=${ic}`);
+        const data = await fetchWithErrorHandling(`/api/ares?ic=${ic}`);
         console.log('ARES data:', data);
         
         if (data.error) {
@@ -116,7 +116,7 @@ function initAddressSuggestions() {
             const query = this.value;
             if (query.length > 2) {
                 try {
-                    const data = await fetchWithErrorHandling(`/api/api-proxy?path=mapy&query=${encodeURIComponent(query)}`);
+                    const data = await fetchWithErrorHandling(`/api/mapy?query=${encodeURIComponent(query)}`);
                     adresaSuggestions.innerHTML = '';
                     if (data.result && data.result.length > 0) {
                         data.result.forEach(item => {

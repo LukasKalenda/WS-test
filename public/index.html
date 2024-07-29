@@ -6,11 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulář pro zákazníky</title>
     <script src="https://api.mapy.cz/loader.js" defer></script>
-
+    <script>
+        Loader.load(null, {suggest: true}, () => {
+          console.log('Mapy.cz API loaded');
+        });
+      </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/datepicker.min.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
 
+    <link href="../styles.css" rel="stylesheet">
     <script src="./script.js" defer></script>
 </head>
 
@@ -28,7 +33,7 @@
             </div>
         </div>
 
-        <form id="zakaznikForm">
+        <form id="zakaznikForm" method="POST" action="/submit-form">
             <div id="firmaPole" class="hidden mb-4">
                 <label for="ic" class="block mb-2">IČ</label>
                 <div class="flex">
