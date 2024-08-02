@@ -24,111 +24,7 @@ function initializeComponents() {
         console.error('Některé elementy nebyly nalezeny');
         return;
     }
-    // ... (existující kód zůstává beze změny)
 
-    function setupMultiStepForm() {
-        const form = document.getElementById('zakaznikForm');
-        const nextButton = document.getElementById('nextButton');
-        const submitButton = document.getElementById('submitButton');
-        const tosCheckbox = document.getElementById('tosCheckbox');
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-
-        nextButton.addEventListener('click', async function (e) {
-            e.preventDefault();
-            if (validateStep1()) {
-                currentStep = 2;
-                step1.classList.add('hidden');
-                step2.classList.remove('hidden');
-            }
-        });
-
-        tosCheckbox.addEventListener('change', function () {
-            submitButton.disabled = !this.checked;
-        });
-
-        form.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            if (currentStep === 2 && tosCheckbox.checked) {
-                const paymentLink = await createInvoiceNinjaClient();
-                if (paymentLink) {
-                    await addSubscriberToEcomail();
-                    window.location.href = paymentLink;
-                }
-            }
-        });
-    }
-
-    // ... (existující funkce zůstávají beze změny)
-
-    async function createInvoiceNinjaClient() {
-        const form = document.getElementById('zakaznikForm');
-        const formData = new FormData(form);
-
-        const clientData = {
-            name: `${formData.get('jmeno')} ${formData.get('prijmeni')}`,
-            contact: {
-                email: formData.get('email'),
-                phone: formData.get('telefon')
-            },
-            address: {
-                address1: formData.get('adresa'),
-            }
-        };
-
-        try {
-            const response = await fetch('/api/create-invoice', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(clientData)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to create client in Invoice Ninja');
-            }
-
-            const data = await response.json();
-            console.log('Invoice Ninja client created:', data);
-            return data.paymentLink;
-        } catch (error) {
-            console.error('Error creating Invoice Ninja client:', error);
-            alert('Chyba při vytváření zákazníka. Zkuste to prosím znovu.');
-        }
-    }
-
-    async function addSubscriberToEcomail() {
-        const form = document.getElementById('zakaznikForm');
-        const formData = new FormData(form);
-
-        const subscriberData = {
-            email: formData.get('email'),
-            name: `${formData.get('jmeno')} ${formData.get('prijmeni')}`,
-            subscribe: document.getElementById('newsletterCheckbox').checked
-        };
-
-        try {
-            const response = await fetch('/api/add-subscriber', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(subscriberData)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to add subscriber to Ecomail');
-            }
-
-            const data = await response.json();
-            console.log('Ecomail subscriber added:', data);
-        } catch (error) {
-            console.error('Error adding subscriber to Ecomail:', error);
-        }
-    }
-
-    // ... (zbytek existujícího kódu zůstává beze změny)
     btnDomacnost.addEventListener('click', function () {
         firmaPole.classList.add('hidden');
         nazevSpolecnostiPole.classList.add('hidden');
@@ -185,7 +81,6 @@ function setupMultiStepForm() {
             currentStep = 2;
             step1.classList.add('hidden');
             step2.classList.remove('hidden');
-            await createInvoiceNinjaClient();
         }
     });
 
@@ -196,34 +91,23 @@ function setupMultiStepForm() {
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
         if (currentStep === 2 && tosCheckbox.checked) {
-            const paymentLink = await getPaymentLink();
-            window.location.href = paymentLink;
+            const paymentLink = await createInvoiceNinjaClient();
+            if (paymentLink) {
+                await addSubscriberToEcomail();
+                window.location.href = paymentLink;
+            }
         }
     });
-}
-
-async function fetchWithErrorHandling(url) {
-    const response = await fetch(url);
-    if (!response.ok) {
-        const text = await response.text();
-        console.error('API Error response:', text);
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.indexOf("application/json") !== -1) {
-        return response.json();
-    } else {
-        const text = await response.text();
-        console.error('Unexpected response type:', contentType);
-        console.error('Response text:', text);
-        throw new Error('Unexpected response type from server');
-    }
 }
 
 async function hledatFirmu(ic) {
     console.log('Hledání firmy s IČ:', ic);
     try {
-        const data = await fetchWithErrorHandling(`/api/ares?ic=${ic}`);
+        const response = await fetch(`/api/ares?ic=${ic}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
         console.log('ARES data:', data);
 
         if (data.error) {
@@ -231,8 +115,17 @@ async function hledatFirmu(ic) {
         }
 
         document.getElementById('nazevSpolecnosti').value = data.obchodniJmeno || '';
-        document.getElementById('adresa').value = `${data.sidlo.ulice} ${data.sidlo.cisloDomovni}, ${data.sidlo.obec}, ${data.sidlo.psc}`;
-        document.getElementById('dic').value = data.dic || 'Není plátce DPH';
+
+        const adresa = `${data.sidlo.ulice || ''} ${data.sidlo.cisloDomovni || ''}${data.sidlo.cisloOrientacni ? '/' + data.sidlo.cisloOrientacni : ''}, ${data.sidlo.obec || ''}, ${data.sidlo.psc || ''}`.trim();
+        document.getElementById('adresa').value = adresa;
+
+        if (data.dic) {
+            document.getElementById('dic').value = data.dic;
+            document.getElementById('dicPole').classList.remove('hidden');
+        } else {
+            document.getElementById('dic').value = 'Není plátce DPH';
+            document.getElementById('dicPole').classList.add('hidden');
+        }
 
         alert('Údaje firmy byly úspěšně načteny');
     } catch (error) {
@@ -296,14 +189,49 @@ function validateStep1() {
 }
 
 async function createInvoiceNinjaClient() {
-    // Implement the logic to create a client in Invoice Ninja
-    console.log('Creating client in Invoice Ninja');
-    // You would typically make an API call to Invoice Ninja here
+    const form = document.getElementById('zakaznikForm');
+    const formData = new FormData(form);
+
+    const clientData = {
+        name: `${formData.get('jmeno')} ${formData.get('prijmeni')}`,
+        contact: {
+            email: formData.get('email'),
+            phone: formData.get('telefon')
+        },
+        address: {
+            address1: formData.get('adresa'),
+        }
+    };
+
+    try {
+        const response = await fetch('/api/create-invoice', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(clientData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to create client in Invoice Ninja');
+        }
+
+        const data = await response.json();
+        console.log('Invoice Ninja client created:', data);
+        return data.paymentLink;
+    } catch (error) {
+        console.error('Error creating Invoice Ninja client:', error);
+        alert('Chyba při vytváření zákazníka. Zkuste to prosím znovu.');
+    }
 }
 
-async function getPaymentLink() {
-    // Implement the logic to get a payment link from Invoice Ninja/Stripe
-    console.log('Getting payment link');
-    // You would typically make an API call to Invoice Ninja or Stripe here
-    return 'https://example.com/payment'; // Replace with actual payment link
+async function addSubscriberToEcomail() {
+    const form = document.getElementById('zakaznikForm');
+    const formData = new FormData(form);
+
+    const subscriberData = {
+        email: formData.get('email'),
+        name: `${formData.get('jmeno')} ${formData.get('prijmeni')}`,
+        subscribe: document.getElementById('newsletterCheckbox').checked
+    }
 }

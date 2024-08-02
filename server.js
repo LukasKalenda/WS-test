@@ -18,7 +18,36 @@ const ECOMAIL_API_KEY = process.env.ECOMAIL_API_KEY;
 const NINJA_API_URL = process.env.NINJA_API_URL;
 const ECOMAIL_API_URL = process.env.ECOMAIL_API_URL;
 
-// ... (existující kód pro API ARES zůstává beze změny)
+app.get('/api/ares', async (req, res) => {
+  const { ic } = req.query;
+  if (!ic) {
+    return res.status(400).json({ error: 'Chybí IČ' });
+  }
+  try {
+    const response = await fetch(`https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/${ic}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    const firmData = {
+      obchodniJmeno: data.obchodniJmeno,
+      sidlo: {
+        ulice: data.sidlo?.ulice,
+        cisloDomovni: data.sidlo?.cisloDomovni,
+        cisloOrientacni: data.sidlo?.cisloOrientacni,
+        obec: data.sidlo?.obec,
+        psc: data.sidlo?.psc
+      },
+      dic: data.dic
+    };
+    
+    res.json(firmData);
+  } catch (error) {
+    console.error('Error fetching ARES data:', error);
+    res.status(500).json({ error: 'Chyba při získávání dat z ARES' });
+  }
+});
 
 app.post('/api/create-invoice', async (req, res) => {
     try {
@@ -85,8 +114,11 @@ app.post('/api/add-subscriber', async (req, res) => {
     }
 });
 
-// ... (existující kód pro SPA router zůstává beze změny)
+// Zajistí, že SPA router bude fungovat
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.listen(port, () => {
-    console.log(`Server běží na portu ${port}`);
+  console.log(`Server běží na portu ${port}`);
 });
