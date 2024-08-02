@@ -1,6 +1,6 @@
 let currentStep = 1;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('DOMContentLoaded event fired');
     initializeComponents();
     setupMultiStepForm();
@@ -24,8 +24,112 @@ function initializeComponents() {
         console.error('Některé elementy nebyly nalezeny');
         return;
     }
+    // ... (existující kód zůstává beze změny)
 
-    btnDomacnost.addEventListener('click', function() {
+    function setupMultiStepForm() {
+        const form = document.getElementById('zakaznikForm');
+        const nextButton = document.getElementById('nextButton');
+        const submitButton = document.getElementById('submitButton');
+        const tosCheckbox = document.getElementById('tosCheckbox');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+
+        nextButton.addEventListener('click', async function (e) {
+            e.preventDefault();
+            if (validateStep1()) {
+                currentStep = 2;
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+            }
+        });
+
+        tosCheckbox.addEventListener('change', function () {
+            submitButton.disabled = !this.checked;
+        });
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            if (currentStep === 2 && tosCheckbox.checked) {
+                const paymentLink = await createInvoiceNinjaClient();
+                if (paymentLink) {
+                    await addSubscriberToEcomail();
+                    window.location.href = paymentLink;
+                }
+            }
+        });
+    }
+
+    // ... (existující funkce zůstávají beze změny)
+
+    async function createInvoiceNinjaClient() {
+        const form = document.getElementById('zakaznikForm');
+        const formData = new FormData(form);
+
+        const clientData = {
+            name: `${formData.get('jmeno')} ${formData.get('prijmeni')}`,
+            contact: {
+                email: formData.get('email'),
+                phone: formData.get('telefon')
+            },
+            address: {
+                address1: formData.get('adresa'),
+            }
+        };
+
+        try {
+            const response = await fetch('/api/create-invoice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(clientData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to create client in Invoice Ninja');
+            }
+
+            const data = await response.json();
+            console.log('Invoice Ninja client created:', data);
+            return data.paymentLink;
+        } catch (error) {
+            console.error('Error creating Invoice Ninja client:', error);
+            alert('Chyba při vytváření zákazníka. Zkuste to prosím znovu.');
+        }
+    }
+
+    async function addSubscriberToEcomail() {
+        const form = document.getElementById('zakaznikForm');
+        const formData = new FormData(form);
+
+        const subscriberData = {
+            email: formData.get('email'),
+            name: `${formData.get('jmeno')} ${formData.get('prijmeni')}`,
+            subscribe: document.getElementById('newsletterCheckbox').checked
+        };
+
+        try {
+            const response = await fetch('/api/add-subscriber', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(subscriberData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add subscriber to Ecomail');
+            }
+
+            const data = await response.json();
+            console.log('Ecomail subscriber added:', data);
+        } catch (error) {
+            console.error('Error adding subscriber to Ecomail:', error);
+        }
+    }
+
+    // ... (zbytek existujícího kódu zůstává beze změny)
+    btnDomacnost.addEventListener('click', function () {
         firmaPole.classList.add('hidden');
         nazevSpolecnostiPole.classList.add('hidden');
         dicPole.classList.add('hidden');
@@ -36,7 +140,7 @@ function initializeComponents() {
         btnFirma.classList.add('bg-gray-300', 'text-gray-700');
     });
 
-    btnFirma.addEventListener('click', function() {
+    btnFirma.addEventListener('click', function () {
         firmaPole.classList.remove('hidden');
         nazevSpolecnostiPole.classList.remove('hidden');
         dicPole.classList.remove('hidden');
@@ -47,14 +151,14 @@ function initializeComponents() {
         btnDomacnost.classList.add('bg-gray-300', 'text-gray-700');
     });
 
-    hledatICBtn.addEventListener('click', function() {
+    hledatICBtn.addEventListener('click', function () {
         const ic = icInput.value;
         if (ic) {
             hledatFirmu(ic);
         }
     });
 
-    casSelect.addEventListener('change', function() {
+    casSelect.addEventListener('change', function () {
         const warningElement = document.getElementById('evening-warning');
         if (this.value === '18:00-20:00' || this.value === '20:00-23:59') {
             warningElement.textContent = "Práce ve večerních a nočních hodinách jsou účtovány vyšší hodinovou sazbou dle ceníku.";
@@ -75,7 +179,7 @@ function setupMultiStepForm() {
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');
 
-    nextButton.addEventListener('click', async function(e) {
+    nextButton.addEventListener('click', async function (e) {
         e.preventDefault();
         if (validateStep1()) {
             currentStep = 2;
@@ -85,11 +189,11 @@ function setupMultiStepForm() {
         }
     });
 
-    tosCheckbox.addEventListener('change', function() {
+    tosCheckbox.addEventListener('change', function () {
         submitButton.disabled = !this.checked;
     });
 
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', async function (e) {
         e.preventDefault();
         if (currentStep === 2 && tosCheckbox.checked) {
             const paymentLink = await getPaymentLink();
@@ -121,15 +225,15 @@ async function hledatFirmu(ic) {
     try {
         const data = await fetchWithErrorHandling(`/api/ares?ic=${ic}`);
         console.log('ARES data:', data);
-        
+
         if (data.error) {
             throw new Error(data.error);
         }
-        
+
         document.getElementById('nazevSpolecnosti').value = data.obchodniJmeno || '';
         document.getElementById('adresa').value = `${data.sidlo.ulice} ${data.sidlo.cisloDomovni}, ${data.sidlo.obec}, ${data.sidlo.psc}`;
         document.getElementById('dic').value = data.dic || 'Není plátce DPH';
-        
+
         alert('Údaje firmy byly úspěšně načteny');
     } catch (error) {
         console.error('Chyba při hledání firmy:', error);
@@ -144,7 +248,7 @@ function initAddressSuggestions() {
     const adresaSuggestions = document.getElementById('adresaSuggestions');
     let suggestionTimeout;
 
-    adresaInput.addEventListener('input', function() {
+    adresaInput.addEventListener('input', function () {
         clearTimeout(suggestionTimeout);
         suggestionTimeout = setTimeout(async () => {
             const query = this.value;
@@ -159,7 +263,7 @@ function initAddressSuggestions() {
                             const div = document.createElement('div');
                             div.textContent = item.title;
                             div.classList.add('p-2', 'hover:bg-gray-100', 'cursor-pointer');
-                            div.addEventListener('click', function() {
+                            div.addEventListener('click', function () {
                                 adresaInput.value = item.title;
                                 adresaSuggestions.classList.add('hidden');
                             });
@@ -179,7 +283,7 @@ function initAddressSuggestions() {
         }, 300);
     });
 
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target !== adresaInput && e.target !== adresaSuggestions) {
             adresaSuggestions.classList.add('hidden');
         }

@@ -116,6 +116,57 @@
                 <button id="nextButton" type="button" class="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300">
                     Další
                 </button>
+
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2">Platební údaje</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="card_number" class="block text-gray-700 text-sm font-bold mb-2">Číslo karty:</label>
+                            <input type="text" id="card_number" name="card_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        </div>
+                        <div>
+                            <label for="expiry_date" class="block text-gray-700 text-sm font-bold mb-2">Datum expirace:</label>
+                            <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/RR" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        </div>
+                        <div>
+                            <label for="cvv" class="block text-gray-700 text-sm font-bold mb-2">CVV:</label>
+                            <input type="text" id="cvv" name="cvv" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <button id="nextButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                        Další
+                    </button>
+                </div>
+            </div>
+
+            <div id="step2" class="hidden">
+                <h3 class="text-xl font-bold mb-4">Potvrzení objednávky</h3>
+                <div class="mb-4">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="form-checkbox" name="newsletter" id="newsletterCheckbox">
+                        <span class="ml-2">Souhlasím se zasíláním <a href="https://it-doma.cz/souhlas-se-zasilanim-obchodnich-sdeleni/" target="_blank" class="text-blue-500">obchodních sdělení</a></span>
+                    </label>
+                </div>
+                <div class="mb-4">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="form-checkbox" name="tos" id="tosCheckbox" required>
+                        <span class="ml-2">Souhlasím s <a href="https://it-doma.cz/obchodni-podminky" target="_blank" class="text-blue-500">obchodními podmínkami</a></span>
+                    </label>
+                </div>
+                <div class="mb-4">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="form-checkbox" name="gdpr" id="gdprCheckbox" required>
+                        <span class="ml-2">Souhlasím s uchováním a <a href="https://it-doma.cz/zasady-zpracovani-osobnich-udaju/" target="_blank" class="text-blue-500">zpracováním osobních údajů</a></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button id="submitButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" disabled>
+                        Potvrdit objednávku
+                    </button>
+                </div>
             </div>
 
             <div id="step2" class="hidden">
