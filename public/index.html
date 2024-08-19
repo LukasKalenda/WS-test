@@ -11,6 +11,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/datepicker.min.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.02.min.css">
+
     <link href="styles.css" rel="stylesheet">
     <script src="./script.js" defer></script>
 </head>
@@ -72,9 +74,12 @@
 
                 <div class="mb-4">
                     <label for="adresa" class="block mb-2">Adresa</label>
-                    <input type="text" id="adresa" name="adresa" required class="w-full p-2 border rounded"
+                    <!-- <input type="text" id="adresa" name="adresa" required class="w-full p-2 border rounded"
                         autocomplete="off">
-                    <div id="adresaSuggestions" class="mt-1 bg-white border rounded shadow-sm hidden"></div>
+                    <div id="adresaSuggestions" class="mt-1 bg-white border rounded shadow-sm hidden"></div> -->
+                    <div class="autoComplete_wrapper">
+                        <input id="autoComplete" type="text" placeholder="Zadejte vaši adresu...">
+                    </div>
                 </div>
 
                 <div class="mb-4">
@@ -205,6 +210,9 @@
             <li>Registrace/přihlášení klienta -> nemusí zadávat údaje, pouze nahlásí novou událost</li>
         </ul>
     </section>
+
+    <script src="../autoCompleteJS.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
 </body>
 
 </html>
