@@ -25,10 +25,9 @@
     <div class="section bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
         <h1 id="formulář-pro-zákazníky" class="text-2xl font-bold mb-6 text-center">Formulář pro zákazníky</h1>
 
-        <!-- Choose type of customer, then show the right form -->
         <form id="zakaznikForm">
-            <div class="mb-6">
-                <p>Typ zákazníka</p>
+            <div id="step0" class="mb-6">
+                <p class="mb-2">Typ zákazníka</p>
                 <div class="flex space-x-4">
                     <label class="inline-flex items-center">
                         <input type="radio" name="customerType" value="person" class="form-radio" checked>
@@ -39,10 +38,10 @@
                         <span class="ml-2">Firma</span>
                     </label>
                 </div>
+                <button type="button" id="startButton" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Začít</button>
             </div>
 
-            <!-- IC -->
-            <div id="step1">
+            <div id="step1" class="hidden">
                 <div id="companyFields" class="hidden mb-4">
                     <label for="ic" class="block mb-2">IČ</label>
                     <div class="flex">
@@ -56,7 +55,6 @@
                     <input type="text" id="nazevSpolecnosti" name="nazevSpolecnosti" class="form-input w-full">
                 </div>
 
-                <!-- Show if tax payer -->
                 <div id="dicPole" class="hidden mb-4">
                     <label for="dic" class="block mb-2">DIČ</label>
                     <input type="text" id="dic" name="dic" class="form-input w-full">
@@ -94,7 +92,6 @@
                     <textarea id="popis" name="popis" required class="form-textarea w-full"></textarea>
                 </div>
 
-                <!-- Calendar picker -->
                 <div class="mb-4">
                     <label for="termin" class="block mb-2">Výběr termínu</label>
                     <div class="relative">
@@ -107,7 +104,6 @@
                     </div>
                 </div>
 
-                <!-- Time schedule picker -->
                 <div class="mb-4">
                     <label class="block mb-2">Výběr časového okna</label>
                     <select name="casoveOkno" required class="form-select w-full">
@@ -120,7 +116,10 @@
 
                 <p class="mb-4 text-sm text-gray-600">Po kliknutí na tlačítko "Další" bude vytvořena záloha ve výši 200 Kč. Tato částka bude použita k uložení vaší platební karty pro budoucí platby.</p>
 
-                <button type="button" id="nextButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Další</button>
+                <div class="flex justify-between">
+                    <button type="button" id="backToStartButton" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Zpět</button>
+                    <button type="button" id="nextButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Další</button>
+                </div>
             </div>
 
             <div id="step2" class="hidden">
@@ -147,7 +146,10 @@
                     </label>
                 </div>
 
-                <button type="submit" id="submitButton" disabled class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed">Potvrdit objednávku</button>
+                <div class="flex justify-between">
+                    <button type="button" id="backToStep1Button" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Zpět</button>
+                    <button type="submit" id="submitButton" disabled class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed">Potvrdit objednávku</button>
+                </div>
             </div>
         </form>
     </div>

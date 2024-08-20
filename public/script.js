@@ -4,6 +4,36 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeComponents();
     setupMultiStepForm();
     initAddressSuggestions();
+
+    const step0 = document.getElementById('step0');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const startButton = document.getElementById('startButton');
+    const nextButton = document.getElementById('nextButton');
+    const backToStartButton = document.getElementById('backToStartButton');
+    const backToStep1Button = document.getElementById('backToStep1Button');
+
+    startButton.addEventListener('click', function() {
+        step0.classList.add('hidden');
+        step1.classList.remove('hidden');
+    });
+
+    nextButton.addEventListener('click', function() {
+        if (validateStep1()) {
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+        }
+    });
+
+    backToStartButton.addEventListener('click', function() {
+        step1.classList.add('hidden');
+        step0.classList.remove('hidden');
+    });
+
+    backToStep1Button.addEventListener('click', function() {
+        step2.classList.add('hidden');
+        step1.classList.remove('hidden');
+    });
 });
 
 function initializeComponents() {
