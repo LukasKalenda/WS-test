@@ -17,6 +17,7 @@ const NINJA_API_KEY = process.env.NINJA_API_KEY;
 const ECOMAIL_API_KEY = process.env.ECOMAIL_API_KEY;
 const NINJA_API_URL = process.env.NINJA_API_URL;
 const ECOMAIL_API_URL = process.env.ECOMAIL_API_URL;
+const MAPY_CZ_API_KEY = process.env.MAPY_CZ_API_KEY;
 
 app.get('/api/ares', async (req, res) => {
   const { ic } = req.query;
@@ -112,6 +113,24 @@ app.post('/api/add-subscriber', async (req, res) => {
         console.error('Error adding subscriber to Ecomail:', error);
         res.status(500).json({ error: 'Failed to add subscriber to Ecomail' });
     }
+});
+
+app.get('/api/suggest-address', async (req, res) => {
+  const { query } = req.query;
+
+  try {
+    const response = await fetch(`https://api.mapy.cz/v1/suggest?apikey=${MAPY_CZ_API_KEY}&query=${encodeURIComponent(query)}&type=street&limit=5&bounds=48.5370786,12.0921668|51.0746358,18.8927040`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching address suggestions:', error);
+    res.status(500).json({ error: 'Failed to fetch address suggestions' });
+  }
 });
 
 // Zajistí, že SPA router bude fungovat

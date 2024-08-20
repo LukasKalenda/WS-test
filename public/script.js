@@ -109,8 +109,10 @@ function initAddressSuggestions() {
             const query = this.value;
             if (query.length > 2) {
                 try {
-                    const url = `https://api.mapy.cz/v1/suggest?apiKey=9XaTSz3fWU_yHEXdZpBT9O0Cj&query=${encodeURIComponent(query)}&type=street&limit=5&bounds=48.5370786,12.0921668|51.0746358,18.8927040`;
-                    const response = await fetch(url);
+                    const response = await fetch(`/api/suggest-address?query=${encodeURIComponent(query)}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                     const data = await response.json();
                     adresaSuggestions.innerHTML = '';
                     if (data.result && data.result.length > 0) {
