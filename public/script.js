@@ -1,70 +1,32 @@
 let currentStep = 1;
 
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('DOMContentLoaded event fired');
+document.addEventListener('DOMContentLoaded', function() {
     initializeComponents();
     setupMultiStepForm();
+    initAddressSuggestions();
 });
 
 function initializeComponents() {
     console.log('Initializing components');
+    const customerTypeRadios = document.querySelectorAll('input[name="customerType"]');
+    const companyFields = document.getElementById('companyFields');
 
-    const btnDomacnost = document.getElementById('btnDomacnost');
-    const btnFirma = document.getElementById('btnFirma');
-    const firmaPole = document.getElementById('firmaPole');
-    const nazevSpolecnostiPole = document.getElementById('nazevSpolecnostiPole');
-    const dicPole = document.getElementById('dicPole');
-    const icInput = document.getElementById('ic');
-    const hledatICBtn = document.getElementById('hledatIC');
-    const adresaInput = document.getElementById('adresa');
-    const adresaSuggestions = document.getElementById('adresaSuggestions');
-    const casSelect = document.getElementById('cas');
+    console.log('Number of customerType radios found:', customerTypeRadios.length);
+    console.log('companyFields element:', companyFields);
 
-    if (!btnDomacnost || !btnFirma || !firmaPole || !nazevSpolecnostiPole || !dicPole || !icInput || !hledatICBtn || !adresaInput || !adresaSuggestions || !casSelect) {
-        console.error('Některé elementy nebyly nalezeny');
-        return;
-    }
-
-    btnDomacnost.addEventListener('click', function () {
-        firmaPole.classList.add('hidden');
-        nazevSpolecnostiPole.classList.add('hidden');
-        dicPole.classList.add('hidden');
-        icInput.removeAttribute('required');
-        btnDomacnost.classList.remove('bg-gray-300', 'text-gray-700');
-        btnDomacnost.classList.add('bg-blue-500', 'text-white');
-        btnFirma.classList.remove('bg-blue-500', 'text-white');
-        btnFirma.classList.add('bg-gray-300', 'text-gray-700');
+    customerTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            console.log('Radio changed to:', this.value);
+            if (this.value === 'company') {
+                companyFields.style.display = 'block';
+                document.getElementById('nazevSpolecnostiPole').style.display = 'block';
+            } else {
+                companyFields.style.display = 'none';
+                document.getElementById('nazevSpolecnostiPole').style.display = 'none';
+                document.getElementById('dicPole').style.display = 'none';
+            }
+        });
     });
-
-    btnFirma.addEventListener('click', function () {
-        firmaPole.classList.remove('hidden');
-        nazevSpolecnostiPole.classList.remove('hidden');
-        dicPole.classList.remove('hidden');
-        icInput.setAttribute('required', '');
-        btnFirma.classList.remove('bg-gray-300', 'text-gray-700');
-        btnFirma.classList.add('bg-blue-500', 'text-white');
-        btnDomacnost.classList.remove('bg-blue-500', 'text-white');
-        btnDomacnost.classList.add('bg-gray-300', 'text-gray-700');
-    });
-
-    hledatICBtn.addEventListener('click', function () {
-        const ic = icInput.value;
-        if (ic) {
-            hledatFirmu(ic);
-        }
-    });
-
-    casSelect.addEventListener('change', function () {
-        const warningElement = document.getElementById('evening-warning');
-        if (this.value === '18:00-20:00' || this.value === '20:00-23:59') {
-            warningElement.textContent = "Práce ve večerních a nočních hodinách jsou účtovány vyšší hodinovou sazbou dle ceníku.";
-            warningElement.classList.remove('hidden');
-        } else {
-            warningElement.classList.add('hidden');
-        }
-    });
-
-    initAddressSuggestions();
 }
 
 function setupMultiStepForm() {
@@ -121,10 +83,10 @@ async function hledatFirmu(ic) {
 
         if (data.dic) {
             document.getElementById('dic').value = data.dic;
-            document.getElementById('dicPole').classList.remove('hidden');
+            document.getElementById('dicPole').style.display = 'block';
         } else {
             document.getElementById('dic').value = 'Není plátce DPH';
-            document.getElementById('dicPole').classList.add('hidden');
+            document.getElementById('dicPole').style.display = 'none';
         }
 
         alert('Údaje firmy byly úspěšně načteny');
@@ -233,5 +195,23 @@ async function addSubscriberToEcomail() {
         email: formData.get('email'),
         name: `${formData.get('jmeno')} ${formData.get('prijmeni')}`,
         subscribe: document.getElementById('newsletterCheckbox').checked
+    };
+
+    try {
+        const response = await fetch('/api/add-subscriber', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(subscriberData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to add subscriber to Ecomail');
+        }
+
+        console.log('Subscriber added to Ecomail');
+    } catch (error) {
+        console.error('Error adding subscriber to Ecomail:', error);
     }
 }

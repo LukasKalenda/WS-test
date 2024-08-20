@@ -5,212 +5,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulář pro zákazníky</title>
-    <script src="https://api.mapy.cz/loader.js" defer></script>
 
+    <!-- Styles -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/datepicker.min.js" defer></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/css/autoComplete.02.min.css">
-
     <link href="styles.css" rel="stylesheet">
-    <script src="./script.js" defer></script>
+
 </head>
 
 <body class="bg-gray-100 min-h-screen p-8">
-    <section class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6 text-center">Formulář pro zákazníky</h1>
+    <div class="section bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+        <h1 id="formulář-pro-zákazníky" class="text-2xl font-bold mb-6 text-center">Formulář pro zákazníky</h1>
 
-        <div class="mb-6">
-            <label class="block mb-2">Typ zákazníka</label>
-            <div class="flex space-x-4">
-                <button id="btnDomacnost"
-                    class="flex-1 py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300">Domácnost</button>
-                <button id="btnFirma"
-                    class="flex-1 py-2 px-4 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition duration-300">Firma</button>
-            </div>
-        </div>
-
+        <!-- Choose type of customer, then show the right form -->
         <form id="zakaznikForm">
+            <div class="mb-6">
+                <p>Typ zákazníka</p>
+                <div class="flex space-x-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="customerType" value="person" class="form-radio" checked>
+                        <span class="ml-2">Domácnost</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="customerType" value="company" class="form-radio">
+                        <span class="ml-2">Firma</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- IC -->
             <div id="step1">
-                <div id="firmaPole" class="hidden mb-4">
+                <div id="companyFields" class="hidden mb-4">
                     <label for="ic" class="block mb-2">IČ</label>
                     <div class="flex">
-                        <input type="text" id="ic" name="ic" class="w-full p-2 border rounded-l">
-                        <button type="button" id="hledatIC"
-                            class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 transition duration-300">Hledat</button>
+                        <input type="text" id="ic" name="ic" class="form-input flex-grow mr-2">
+                        <button type="button" onclick="hledatFirmu(document.getElementById('ic').value)" class="bg-blue-500 text-white px-4 py-2 rounded">Hledat</button>
                     </div>
                 </div>
 
                 <div id="nazevSpolecnostiPole" class="hidden mb-4">
                     <label for="nazevSpolecnosti" class="block mb-2">Název společnosti</label>
-                    <input type="text" id="nazevSpolecnosti" name="nazevSpolecnosti" class="w-full p-2 border rounded"
-                        readonly>
+                    <input type="text" id="nazevSpolecnosti" name="nazevSpolecnosti" class="form-input w-full">
                 </div>
 
+                <!-- Show if tax payer -->
                 <div id="dicPole" class="hidden mb-4">
                     <label for="dic" class="block mb-2">DIČ</label>
-                    <input type="text" id="dic" name="dic" class="w-full p-2 border rounded" readonly>
+                    <input type="text" id="dic" name="dic" class="form-input w-full">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label for="jmeno" class="block mb-2">Jméno</label>
-                        <input type="text" id="jmeno" name="jmeno" required class="w-full p-2 border rounded">
+                        <input type="text" id="jmeno" name="jmeno" required class="form-input w-full">
                     </div>
                     <div>
                         <label for="prijmeni" class="block mb-2">Příjmení</label>
-                        <input type="text" id="prijmeni" name="prijmeni" required class="w-full p-2 border rounded">
+                        <input type="text" id="prijmeni" name="prijmeni" required class="form-input w-full">
                     </div>
                     <div>
                         <label for="email" class="block mb-2">Email</label>
-                        <input type="email" id="email" name="email" required class="w-full p-2 border rounded">
+                        <input type="email" id="email" name="email" required class="form-input w-full">
                     </div>
                     <div>
                         <label for="telefon" class="block mb-2">Telefon</label>
-                        <input type="tel" id="telefon" name="telefon" required class="w-full p-2 border rounded">
+                        <input type="tel" id="telefon" name="telefon" required class="form-input w-full">
                     </div>
                 </div>
 
                 <div class="mb-4">
                     <label for="adresa" class="block mb-2">Adresa</label>
-                    <!-- <input type="text" id="adresa" name="adresa" required class="w-full p-2 border rounded"
-                        autocomplete="off">
-                    <div id="adresaSuggestions" class="mt-1 bg-white border rounded shadow-sm hidden"></div> -->
                     <div class="autoComplete_wrapper">
-                        <input id="autoComplete" type="text" placeholder="Zadejte vaši adresu...">
+                        <input type="text" id="adresa" name="adresa" required class="form-input w-full">
                     </div>
+                    <div id="adresaSuggestions" class="hidden mt-2 bg-white border border-gray-300 rounded shadow-lg"></div>
                 </div>
 
                 <div class="mb-4">
                     <label for="popis" class="block mb-2">Popis požadavku</label>
-                    <textarea id="popis" name="popis" required class="w-full p-2 border rounded"></textarea>
+                    <textarea id="popis" name="popis" required class="form-textarea w-full"></textarea>
                 </div>
 
+                <!-- Calendar picker -->
                 <div class="mb-4">
-                    <label for="datum" class="block mb-2">Výběr termínu</label>
+                    <label for="termin" class="block mb-2">Výběr termínu</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd"
-                                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                    clip-rule="evenodd"></path>
+                            <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
                             </svg>
                         </div>
-                        <input datepicker datepicker-format="dd/mm/yyyy" type="text" id="datum"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5"
-                            placeholder="Vyberte datum">
+                        <input type="date" id="termin" name="termin" required class="form-input pl-10 w-full">
                     </div>
                 </div>
 
+                <!-- Time schedule picker -->
                 <div class="mb-4">
-                    <label for="cas" class="block mb-2">Výběr časového okna</label>
-                    <select id="cas" name="cas" required class="w-full p-2 border rounded">
+                    <label class="block mb-2">Výběr časového okna</label>
+                    <select name="casoveOkno" required class="form-select w-full">
                         <option value="">Vyberte časové okno</option>
                         <option value="9:00-18:00">9:00-18:00</option>
                         <option value="18:00-20:00">18:00-20:00</option>
                         <option value="20:00-23:59">20:00-23:59</option>
                     </select>
-                    <p id="evening-warning" class="text-red-500 mt-2 hidden"></p>
                 </div>
 
-                <p class="mt-4 text-sm text-gray-600">
-                    Po kliknutí na tlačítko "Další" bude vytvořena záloha ve výši 200 Kč. Tato částka bude použita k uložení vaší platební karty pro budoucí platby.
-                </p>
-                <button id="nextButton" type="button" class="w-full py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300">
-                    Další
-                </button>
+                <p class="mb-4 text-sm text-gray-600">Po kliknutí na tlačítko "Další" bude vytvořena záloha ve výši 200 Kč. Tato částka bude použita k uložení vaší platební karty pro budoucí platby.</p>
 
-                <div class="mb-4">
-                    <h3 class="text-lg font-semibold mb-2">Platební údaje</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="card_number" class="block text-gray-700 text-sm font-bold mb-2">Číslo karty:</label>
-                            <input type="text" id="card_number" name="card_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        </div>
-                        <div>
-                            <label for="expiry_date" class="block text-gray-700 text-sm font-bold mb-2">Datum expirace:</label>
-                            <input type="text" id="expiry_date" name="expiry_date" placeholder="MM/RR" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        </div>
-                        <div>
-                            <label for="cvv" class="block text-gray-700 text-sm font-bold mb-2">CVV:</label>
-                            <input type="text" id="cvv" name="cvv" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <button id="nextButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-                        Další
-                    </button>
-                </div>
+                <button type="button" id="nextButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Další</button>
             </div>
 
             <div id="step2" class="hidden">
                 <h3 class="text-xl font-bold mb-4">Potvrzení objednávky</h3>
-                <div class="mb-4">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" class="form-checkbox" name="newsletter" id="newsletterCheckbox">
-                        <span class="ml-2">Souhlasím se zasíláním <a href="https://it-doma.cz/souhlas-se-zasilanim-obchodnich-sdeleni/" target="_blank" class="text-blue-500">obchodních sdělení</a></span>
-                    </label>
-                </div>
-                <div class="mb-4">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" class="form-checkbox" name="tos" id="tosCheckbox" required>
-                        <span class="ml-2">Souhlasím s <a href="https://it-doma.cz/obchodni-podminky" target="_blank" class="text-blue-500">obchodními podmínkami</a></span>
-                    </label>
-                </div>
-                <div class="mb-4">
-                    <label class="inline-flex items-center">
-                        <input type="checkbox" class="form-checkbox" name="gdpr" id="gdprCheckbox" required>
-                        <span class="ml-2">Souhlasím s uchováním a <a href="https://it-doma.cz/zasady-zpracovani-osobnich-udaju/" target="_blank" class="text-blue-500">zpracováním osobních údajů</a></span>
-                    </label>
-                </div>
-                <div class="flex items-center justify-between">
-                    <button id="submitButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit" disabled>
-                        Potvrdit objednávku
-                    </button>
-                </div>
-            </div>
 
-            <div id="step2" class="hidden">
-                <h3 class="text-xl font-bold mb-4">Potvrzení objednávky</h3>
                 <div class="mb-4">
-                    <input type="checkbox" id="tosCheckboxOS" class="mr-2">
-                    <label for="tosCheckbox">Souhlasím se zasíláním <a href="https://it-doma.cz/souhlas-se-zasilanim-obchodnich-sdeleni/" target="_blank">obchodních sdělení</a></label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" id="newsletterCheckbox" name="newsletter" class="form-checkbox">
+                        <span class="ml-2">Souhlasím se zasíláním <a href="https://it-doma.cz/souhlas-se-zasilanim-obchodnich-sdeleni/" class="text-blue-500" target="_blank">obchodních sdělení</a></span>
+                    </label>
                 </div>
+
                 <div class="mb-4">
-                    <input type="checkbox" id="tosCheckboxOP" class="mr-2">
-                    <label for="tosCheckbox">Souhlasím s <a href="https://it-doma.cz/obchodni-podminky" target="_blank">obchodními podmínkami</a></label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" id="tosCheckbox" name="tos" required class="form-checkbox">
+                        <span class="ml-2">Souhlasím s <a href="https://it-doma.cz/obchodni-podminky" class="text-blue-500" target="_blank">obchodními podmínkami</a></span>
+                    </label>
                 </div>
+
                 <div class="mb-4">
-                    <input type="checkbox" id="tosCheckboxOU" class="mr-2">
-                    <label for="tosCheckbox">Souhlasím s uchováním a <a href="https://it-doma.cz/zasady-zpracovani-osobnich-udaju/" target="_blank">zpracováním osobních údajů</a></label>
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" id="gdprCheckbox" name="gdpr" required class="form-checkbox">
+                        <span class="ml-2">Souhlasím s uchováním a <a href="https://it-doma.cz/zasady-zpracovani-osobnich-udaju/" class="text-blue-500" target="_blank">zpracováním osobních údajů</a></span>
+                    </label>
                 </div>
-                <button id="submitButton" type="submit" class="w-full py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300" disabled>
-                    Potvrdit objednávku
-                </button>
+
+                <button type="submit" id="submitButton" disabled class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed">Potvrdit objednávku</button>
             </div>
         </form>
-    </section>
+    </div>
 
-    <section class="mt-20 bg-white shadow-md p-4 pl-6">
-        <ul class="list-disc">
-            <li><b>IČ</b> API z Aresu</li>
-            <li>Propojení termínu z kalendářem - </li>
-            <li>MAPY - API Call načítání (mapy.cz)</li>
-            <li>Platební systém - </li>
-            <li>Kategorizace IT problému, popřípadě jiné</li>
-            <li>Výběr zaměstance</li>
-        </ul>
-        <hr class="h-0.5 mt-3" />
-        <span class="font-bold">Možná rozšíření</span>
-        <ul class="list-disc">
-            <li>Registrace/přihlášení klienta -> nemusí zadávat údaje, pouze nahlásí novou událost</li>
-        </ul>
-    </section>
-
+    <!-- Scripts -->
+    <script src="./script.js"></script>
     <script src="../autoCompleteJS.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
 </body>
