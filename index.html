@@ -17,6 +17,7 @@
 </head>
 
 <body class="bg-gray-100 min-h-screen p-8">
+    <!-- PAGE 1 -->
     <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
         <h1 class="text-2xl font-bold mb-6 text-center">Formulář pro zákazníky</h1>
 
@@ -100,10 +101,72 @@
             </div>
 
             <button type="submit"
-                class="w-full py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300">Odeslat</button>
+                class="w-full py-2 px-4 bg-green-500 text-white rounded hover:bg-green-600 transition duration-300">Pokračovat</button>
         </form>
     </div>
 
+    <!-- PAGE 2-->
+    <div id="orderConfirmation" class="hidden bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+        <h2 class="text-2xl font-bold mb-6 text-center">Potvrzení objednávky</h2>
+
+        <div id="orderSummary" class="mb-6">
+            <!-- Zde bude shrnutí objednávky -->
+        </div>
+
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold mb-4">Smluvní podmínky</h3>
+            <div class="mb-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" id="newsletterCheckbox" name="newsletter" class="form-checkbox">
+                    <span class="ml-2">Souhlasím se zasíláním <a
+                            href="https://it-doma.cz/souhlas-se-zasilanim-obchodnich-sdeleni/" class="text-blue-500"
+                            target="_blank">obchodních sdělení</a></span>
+                </label>
+            </div>
+            <div class="mb-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" id="tosCheckbox" name="tos" required class="form-checkbox">
+                    <span class="ml-2">Souhlasím s <a href="https://it-doma.cz/obchodni-podminky" class="text-blue-500"
+                            target="_blank">obchodními podmínkami</a></span>
+                </label>
+            </div>
+            <div class="mb-4">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" id="gdprCheckbox" name="gdpr" required class="form-checkbox">
+                    <span class="ml-2">Souhlasím s uchováním a <a
+                            href="https://it-doma.cz/zasady-zpracovani-osobnich-udaju/" class="text-blue-500"
+                            target="_blank">zpracováním osobních údajů</a></span>
+                </label>
+            </div>
+        </div>
+
+        <div id="paymentForm" class="mb-6">
+            <h3 class="text-xl font-semibold mb-4">Platební údaje</h3>
+            <div class="mb-4">
+                <label for="cardNumber" class="block mb-2">Číslo karty</label>
+                <input type="text" id="cardNumber" name="cardNumber" class="w-full p-2 border rounded" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="expiryDate" class="block mb-2">Datum expirace</label>
+                    <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/RR"
+                        class="w-full p-2 border rounded" required>
+                </div>
+                <div>
+                    <label for="cvv" class="block mb-2">CVV</label>
+                    <input type="text" id="cvv" name="cvv" class="w-full p-2 border rounded" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between">
+            <button type="button" id="backToStep1Button"
+                class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Zpět</button>
+            <button type="submit" id="submitPaymentButton"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Potvrdit a zaplatit</button>
+        </div>
+    </div>
+    <!-- SCRIPTS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/datepicker.min.js"></script>
     <script>
         const btnDomacnost = document.getElementById('btnDomacnost');
@@ -133,9 +196,9 @@
     <!-- API Mapy.cz -->
     <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
     <script src="autoComplete.js"></script>
-    
+
     <!-- ARES API -->
-     <script src="aresApi.js"></script>
+    <script src="aresApi.js"></script>
 </body>
 
 </html>
