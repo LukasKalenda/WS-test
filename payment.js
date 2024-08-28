@@ -1,17 +1,40 @@
-// Konstanta pro API klíč (v produkci by měla být bezpečně uložena na serveru)
-const API_KEY = '';
+const API_KEY_NJ = 'l9lqOFBTrOV4nlV4bSgRwBONyGoQvJt9Ib5qmM9w6F5oc0ny3jHoztzTD6ZzoQQR';
 
 document.addEventListener('DOMContentLoaded', function() {
+    const customerForm = document.getElementById('customerForm');
     const submitButton = document.getElementById('submitButton');
     const orderConfirmation = document.getElementById('orderConfirmation');
     const submitPaymentButton = document.getElementById('submitPaymentButton');
     const backToStep1Button = document.getElementById('backToStep1Button');
+    const btnDomacnost = document.getElementById('btnDomacnost');
+    const btnFirma = document.getElementById('btnFirma');
+    const firmaPole = document.getElementById('firmaPole');
+    const icInput = document.getElementById('ic');
+
+    // Přepínání mezi domácností a firmou
+    btnDomacnost.addEventListener('click', function () {
+        firmaPole.classList.add('hidden');
+        icInput.removeAttribute('required');
+        btnDomacnost.classList.remove('bg-gray-300', 'text-gray-700');
+        btnDomacnost.classList.add('bg-blue-500', 'text-white');
+        btnFirma.classList.remove('bg-blue-500', 'text-white');
+        btnFirma.classList.add('bg-gray-300', 'text-gray-700');
+    });
+
+    btnFirma.addEventListener('click', function () {
+        firmaPole.classList.remove('hidden');
+        icInput.setAttribute('required', '');
+        btnFirma.classList.remove('bg-gray-300', 'text-gray-700');
+        btnFirma.classList.add('bg-blue-500', 'text-white');
+        btnDomacnost.classList.remove('bg-blue-500', 'text-white');
+        btnDomacnost.classList.add('bg-gray-300', 'text-gray-700');
+    });
 
     // Zobrazení potvrzení objednávky
-    submitButton.addEventListener('click', function(e) {
+    customerForm.addEventListener('submit', function(e) {
         e.preventDefault();
         if (validateForm()) {
-            document.querySelector('form').classList.add('hidden');
+            customerForm.classList.add('hidden');
             orderConfirmation.classList.remove('hidden');
             updateOrderSummary();
         }
@@ -39,23 +62,42 @@ document.addEventListener('DOMContentLoaded', function() {
     // Návrat zpět na první krok
     backToStep1Button.addEventListener('click', function() {
         orderConfirmation.classList.add('hidden');
-        document.querySelector('form').classList.remove('hidden');
+        customerForm.classList.remove('hidden');
     });
 
     function validateForm() {
-        // Implementujte validaci formuláře
-        return true; // Vraťte true, pokud je formulář validní
+        const requiredFields = customerForm.querySelectorAll('[required]');
+        let isValid = true;
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('border-red-500');
+            } else {
+                field.classList.remove('border-red-500');
+            }
+        });
+        return isValid;
     }
 
     function validatePaymentForm() {
-        // Implementujte validaci platebního formuláře
-        return true; // Vraťte true, pokud je platební formulář validní
+        const cardNumber = document.getElementById('cardNumber').value.trim();
+        const expiryDate = document.getElementById('expiryDate').value.trim();
+        const cvv = document.getElementById('cvv').value.trim();
+
+        return cardNumber && expiryDate && cvv;
     }
 
     function updateOrderSummary() {
-        // Implementujte aktualizaci shrnutí objednávky
         const orderSummary = document.getElementById('orderSummary');
-        orderSummary.innerHTML = '<p>Zde bude shrnutí vaší objednávky...</p>';
+        const formData = new FormData(customerForm);
+        let summaryHTML = '<h3>Shrnutí objednávky:</h3><ul>';
+        for (let [key, value] of formData.entries()) {
+            if (value) {
+                summaryHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+            }
+        }
+        summaryHTML += '</ul>';
+        orderSummary.innerHTML = summaryHTML;
     }
 
     async function processPayment() {
@@ -68,10 +110,10 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY}`
+                'Authorization': `Bearer ${API_KEY_NJ}`
             },
             body: JSON.stringify({
-                amount: 1000, // Částka v nejmenších jednotkách měny (např. centy)
+                amount: 200, // Částka v nejmenších jednotkách měny (např. centy)
                 currency: 'CZK',
                 card: {
                     number: cardNumber,
