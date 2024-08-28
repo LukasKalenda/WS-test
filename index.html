@@ -48,7 +48,7 @@
             <div class="mb-4">
                 <label for="autoComplete">Adresa</label>
                 <div class="autoComplete_wrapper">
-                    <input id="autoComplete" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off">
+                    <input id="autoComplete" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" class="w-full p-2 border rounded">
                 </div>
             </div>
 
@@ -112,20 +112,97 @@
             </div>
         </div>
 
+        <!-- PAYMENTS -->
         <div id="paymentForm" class="mb-6">
-            <h3 class="text-xl font-semibold mb-4">Platební údaje</h3>
-            <div class="mb-4">
-                <label for="cardNumber" class="block mb-2">Číslo karty</label>
-                <input type="text" id="cardNumber" name="cardNumber" class="w-full p-2 border rounded" required>
-            </div>
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="expiryDate" class="block mb-2">Datum expirace</label>
-                    <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/RR" class="w-full p-2 border rounded" required>
-                </div>
-                <div>
-                    <label for="cvv" class="block mb-2">CVV</label>
-                    <input type="text" id="cvv" name="cvv" class="w-full p-2 border rounded" required>
+            <div class="wrapper" id="app">
+                <div class="card-form">
+                    <div class="card-list">
+                        <div class="card-item" id="card-item">
+                            <div class="card-item__side -front">
+                                <div class="card-item__focus" id="focusElement"></div>
+                                <div class="card-item__cover">
+                                    <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/9.jpeg" class="card-item__bg">
+                                </div>
+                                
+                                <div class="card-item__wrapper">
+                                    <div class="card-item__top">
+                                        <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/chip.png" class="card-item__chip">
+                                        <div class="card-item__type">
+                                            <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/visa.png" id="cardTypeImg" alt="card type">
+                                        </div>
+                                    </div>
+                                    <label for="cardNumber" class="card-item__number" id="cardNumberDisplay">
+                                        <span>#### #### #### ####</span>
+                                    </label>
+                                    <div class="card-item__content">
+                                        <label for="cardName" class="card-item__info">
+                                            <div class="card-item__holder">Card Holder</div>
+                                            <div class="card-item__name" id="cardNameDisplay">Full Name</div>
+                                        </label>
+                                        <div class="card-item__date" id="cardExpirationDisplay">
+                                            <label for="cardMonth" class="card-item__dateTitle">Expires</label>
+                                            <label for="cardMonth" class="card-item__dateItem">
+                                                <span>MM</span>
+                                            </label>
+                                            /
+                                            <label for="cardYear" class="card-item__dateItem">
+                                                <span>YY</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card-item__side -back">
+                                <div class="card-item__cover">
+                                    <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/9.jpeg" class="card-item__bg">
+                                </div>
+                                <div class="card-item__band"></div>
+                                <div class="card-item__cvv">
+                                    <div class="card-item__cvvTitle">CVV</div>
+                                    <div class="card-item__cvvBand" id="cardCvvDisplay">
+                                        <span>***</span>
+                                    </div>
+                                    <div class="card-item__type">
+                                        <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/visa.png" id="cardTypeImgBack" alt="card type">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-form__inner">
+                        <div class="card-input">
+                            <label for="cardNumber" class="card-input__label">Číslo karty</label>
+                            <input type="text" id="cardNumber" class="card-input__input" data-ref="cardNumber" maxlength="19" autocomplete="off">
+                        </div>
+                        <div class="card-input">
+                            <label for="cardName" class="card-input__label">Jméno držitele karty</label>
+                            <input type="text" id="cardName" class="card-input__input" data-ref="cardName" autocomplete="off">
+                        </div>
+                        <div class="card-form__row">
+                            <div class="card-form__col">
+                                <div class="card-form__group">
+                                    <label for="cardMonth" class="card-input__label">Datum expirace</label>
+                                    <select class="card-input__input -select" id="cardMonth" data-ref="cardMonth">
+                                        <option value="" disabled selected>Měsíc</option>
+                                        <!-- Options for months will be added by JavaScript -->
+                                    </select>
+                                    <select class="card-input__input -select" id="cardYear" data-ref="cardYear">
+                                        <option value="" disabled selected>Rok</option>
+                                        <!-- Options for years will be added by JavaScript -->
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-form__col -cvv">
+                                <div class="card-input">
+                                    <label for="cardCvv" class="card-input__label">CVV</label>
+                                    <input type="text" class="card-input__input" id="cardCvv" maxlength="3" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <button class="card-form__button">Odeslat</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,7 +214,9 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
+
     <script src="autoComplete.js"></script>
     <script src="payment.js"></script>
+    <script src="creditCard.js"></script>
 </body>
 </html>
