@@ -1,3 +1,5 @@
+// import { createEcomailList } from './ecoMail.js';
+
 const API_KEY_NJ = 'l9lqOFBTrOV4nlV4bSgRwBONyGoQvJt9Ib5qmM9w6F5oc0ny3jHoztzTD6ZzoQQR';
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -128,6 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const result = await response.json();
 
         if (response.ok) {
+            await createEcomailList(); // Volání funkce z ecoMail.js
             return { success: true, paymentId: result.id };
         } else {
             return { success: false, message: result.error.message };
