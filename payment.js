@@ -1,4 +1,4 @@
-const API_KEY_NJ = 'l9lqOFBTrOV4nlV4bSgRwBONyGoQvJt9Ib5qmM9w6F5oc0ny3jHoztzTD6ZzoQQR';
+const API_KEY_NJ = 'zkqqUnm4u1I6RM22Klkf731Y668SWVkry1RrU5q8i2i32lcdlcEx4Tr9r7txCjud';
 
 document.addEventListener('DOMContentLoaded', function() {
     const customerForm = document.getElementById('customerForm');
@@ -79,13 +79,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return isValid;
     }
 
-    function validatePaymentForm() {
-        const cardNumber = document.getElementById('cardNumber').value.trim();
-        const expiryDate = document.getElementById('expiryDate').value.trim();
-        const cvv = document.getElementById('cvv').value.trim();
+    // function validatePaymentForm() {
+    //     const cardNumber = document.getElementById('cardNumber').value.trim();
+    //     const expiryDate = document.getElementById('expiryDate').value.trim();
+    //     const cvv = document.getElementById('cvv').value.trim();
 
-        return cardNumber && expiryDate && cvv;
-    }
+    //     return cardNumber && expiryDate && cvv;
+    // }
 
     function updateOrderSummary() {
         const orderSummary = document.getElementById('orderSummary');
@@ -101,9 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function processPayment() {
-        const cardNumber = document.getElementById('cardNumber').value;
-        const expiryDate = document.getElementById('expiryDate').value;
-        const cvv = document.getElementById('cvv').value;
+        // const cardNumber = document.getElementById('cardNumber').value;
+        // const expiryDate = document.getElementById('expiryDate').value;
+        // const cvv = document.getElementById('cvv').value;
 
         // Vytvoření platby pomocí Invoicing API
         const response = await fetch('https://api.invoicing.co/v1/payments', {
