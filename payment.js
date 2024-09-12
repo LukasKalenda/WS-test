@@ -1,136 +1,125 @@
+// Invoice Ninja API integration
+const API_BASE_URL = 'https://api.invoicing.co/api/v1';
 const API_KEY_NJ = 'zkqqUnm4u1I6RM22Klkf731Y668SWVkry1RrU5q8i2i32lcdlcEx4Tr9r7txCjud';
 
-document.addEventListener('DOMContentLoaded', function() {
-    const customerForm = document.getElementById('customerForm');
-    const submitButton = document.getElementById('submitButton');
-    const orderConfirmation = document.getElementById('orderConfirmation');
-    const submitPaymentButton = document.getElementById('submitPaymentButton');
-    const backToStep1Button = document.getElementById('backToStep1Button');
-    const btnDomacnost = document.getElementById('btnDomacnost');
-    const btnFirma = document.getElementById('btnFirma');
-    const firmaPole = document.getElementById('firmaPole');
-    const icInput = document.getElementById('ic');
-
-    // Přepínání mezi domácností a firmou
-    btnDomacnost.addEventListener('click', function () {
-        firmaPole.classList.add('hidden');
-        icInput.removeAttribute('required');
-        btnDomacnost.classList.remove('bg-gray-300', 'text-gray-700');
-        btnDomacnost.classList.add('bg-blue-500', 'text-white');
-        btnFirma.classList.remove('bg-blue-500', 'text-white');
-        btnFirma.classList.add('bg-gray-300', 'text-gray-700');
+async function createOrGetClient(clientData) {
+  try {
+    // Check if client exists
+    const searchResponse = await fetch(`${API_BASE_URL}/clients?email=${clientData.email}`, {
+      headers: {
+        'X-Api-Token': API_KEY_NJ,
+        'Content-Type': 'application/json'
+      }
     });
+    const searchResult = await searchResponse.json();
 
-    btnFirma.addEventListener('click', function () {
-        firmaPole.classList.remove('hidden');
-        icInput.setAttribute('required', '');
-        btnFirma.classList.remove('bg-gray-300', 'text-gray-700');
-        btnFirma.classList.add('bg-blue-500', 'text-white');
-        btnDomacnost.classList.remove('bg-blue-500', 'text-white');
-        btnDomacnost.classList.add('bg-gray-300', 'text-gray-700');
-    });
-
-    // Zobrazení potvrzení objednávky
-    customerForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        if (validateForm()) {
-            customerForm.classList.add('hidden');
-            orderConfirmation.classList.remove('hidden');
-            updateOrderSummary();
-        }
-    });
-
-    // Zpracování platby
-    submitPaymentButton.addEventListener('click', async function(e) {
-        e.preventDefault();
-        if (validatePaymentForm()) {
-            try {
-                const paymentResult = await processPayment();
-                if (paymentResult.success) {
-                    alert('Platba byla úspěšně zpracována!');
-                    // Zde můžete přesměrovat uživatele na stránku s potvrzením
-                } else {
-                    alert('Platba se nezdařila: ' + paymentResult.message);
-                }
-            } catch (error) {
-                console.error('Chyba při zpracování platby:', error);
-                alert('Došlo k chybě při zpracování platby. Zkuste to prosím znovu.');
-            }
-        }
-    });
-
-    // Návrat zpět na první krok
-    backToStep1Button.addEventListener('click', function() {
-        orderConfirmation.classList.add('hidden');
-        customerForm.classList.remove('hidden');
-    });
-
-    function validateForm() {
-        const requiredFields = customerForm.querySelectorAll('[required]');
-        let isValid = true;
-        requiredFields.forEach(field => {
-            if (!field.value.trim()) {
-                isValid = false;
-                field.classList.add('border-red-500');
-            } else {
-                field.classList.remove('border-red-500');
-            }
-        });
-        return isValid;
+    if (searchResult.data.length > 0) {
+      // Client exists, return the first match
+      return searchResult.data[0];
+    } else {
+      // Create new client
+      const createResponse = await fetch(`${API_BASE_URL}/clients`, {
+        method: 'POST',
+        headers: {
+          'X-Api-Token': API_KEY_NJ,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(clientData)
+      });
+      return await createResponse.json();
     }
+  } catch (error) {
+    console.error('Error in createOrGetClient:', error);
+    throw error;
+  }
+}
 
-    // function validatePaymentForm() {
-    //     const cardNumber = document.getElementById('cardNumber').value.trim();
-    //     const expiryDate = document.getElementById('expiryDate').value.trim();
-    //     const cvv = document.getElementById('cvv').value.trim();
+async function createProject(projectData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/projects`, {
+      method: 'POST',
+      headers: {
+        'X-Api-Token': API_KEY_NJ,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(projectData)
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Error in createProject:', error);
+    throw error;
+  }
+}
 
-    //     return cardNumber && expiryDate && cvv;
-    // }
+async function createTask(taskData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/tasks`, {
+      method: 'POST',
+      headers: {
+        'X-Api-Token': API_KEY_NJ,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(taskData)
+    });
+    return await response.json();
+  } catch (error) {
+    console.error('Error in createTask:', error);
+    throw error;
+  }
+}
 
-    function updateOrderSummary() {
-        const orderSummary = document.getElementById('orderSummary');
-        const formData = new FormData(customerForm);
-        let summaryHTML = '<h3>Shrnutí objednávky:</h3><ul>';
-        for (let [key, value] of formData.entries()) {
-            if (value) {
-                summaryHTML += `<li><strong>${key}:</strong> ${value}</li>`;
-            }
-        }
-        summaryHTML += '</ul>';
-        orderSummary.innerHTML = summaryHTML;
-    }
+async function processCustomerRequest(formData) {
+  try {
+    // 1. Create or get client
+    const clientData = {
+      name: `${formData.jmeno} ${formData.prijmeni}`,
+      email: formData.email,
+      phone: formData.telefon,
+      address1: formData.adresa
+    };
+    const client = await createOrGetClient(clientData);
 
-    async function processPayment() {
-        // const cardNumber = document.getElementById('cardNumber').value;
-        // const expiryDate = document.getElementById('expiryDate').value;
-        // const cvv = document.getElementById('cvv').value;
+    // 2. Create project
+    const projectData = {
+      client_id: client.id,
+      name: `IT Support - ${new Date().toISOString().split('T')[0]}`,
+      description: formData.popisProblemu
+    };
+    const project = await createProject(projectData);
 
-        // Vytvoření platby pomocí Invoicing API
-        const response = await fetch('https://api.invoicing.co/v1/payments', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEY_NJ}`
-            },
-            body: JSON.stringify({
-                amount: 200, // Částka v nejmenších jednotkách měny (např. centy)
-                currency: 'CZK',
-                card: {
-                    number: cardNumber,
-                    exp_month: expiryDate.split('/')[0],
-                    exp_year: '20' + expiryDate.split('/')[1],
-                    cvc: cvv
-                },
-                description: 'Platba za služby IT-DOMA'
-            })
-        });
+    // 3. Create task
+    const taskData = {
+      project_id: project.id,
+      description: formData.popisProblemu,
+      time_log: '1:00:00', // Placeholder time log
+      date: formData.datumTerminu,
+      custom_value1: formData.casoveOkno
+    };
+    const task = await createTask(taskData);
 
-        const result = await response.json();
+    return {
+      client: client,
+      project: project,
+      task: task
+    };
+  } catch (error) {
+    console.error('Error in CustomerRequest:', error);
+    throw error;
+  }
+}
 
-        if (response.ok) {
-            return { success: true, paymentId: result.id };
-        } else {
-            return { success: false, message: result.error.message };
-        }
-    }
+// Usage in your form submission handler
+document.getElementById('customerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const formDataObject = Object.fromEntries(formData.entries());
+
+  try {
+    const result = await processCustomerRequest(formDataObject);
+    console.log('Request processed successfully:', result);
+    // Handle successful submission (e.g., show confirmation, redirect)
+  } catch (error) {
+    console.error('Failed to process request:', error);
+    // Handle error (e.g., show error message to user)
+  }
 });
