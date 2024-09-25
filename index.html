@@ -11,76 +11,74 @@
     <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
         <h1 id="formulář-pro-zákazníky" class="text-2xl font-bold mb-6 text-center">Formulář pro zákazníky</h1>
         
-        <form id="customerForm">
+        <form id="customerForm" class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+            <h1 class="text-2xl font-bold mb-6 text-center">Formulář pro zákazníky</h1>
+          
             <div class="mb-6">
-                <p>Typ zákazníka</p>
-                <div class="flex space-x-4">
-                    <button type="button" id="btnDomacnost" class="bg-blue-500 text-white px-4 py-2 rounded">Domácnost</button>
-                    <button type="button" id="btnFirma" class="bg-gray-300 text-gray-700 px-4 py-2 rounded">Firma</button>
-                </div>
+              <label class="block mb-2">Typ zákazníka</label>
+              <div class="flex space-x-4">
+                <label>
+                  <input type="radio" name="typZakaznika" value="domacnost" checked> Domácnost
+                </label>
+                <label>
+                  <input type="radio" name="typZakaznika" value="firma"> Firma
+                </label>
+              </div>
             </div>
-
+          
             <div id="firmaPole" class="hidden mb-4">
-                <label for="ic">IČ</label>
-                <input type="text" id="ic" name="ic" class="w-full p-2 border rounded">
-                <button type="button" id="doplnitUdaje" class="mt-2 bg-blue-500 text-white px-4 py-2 rounded">Doplnit údaje</button>
+              <label class="block mb-2">IČ</label>
+              <input type="text" name="ic" class="w-full p-2 border rounded">
             </div>
-
+          
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label for="jmeno">Jméno</label>
-                    <input type="text" id="jmeno" name="jmeno" required class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label for="prijmeni">Příjmení</label>
-                    <input type="text" id="prijmeni" name="prijmeni" required class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required class="w-full p-2 border rounded">
-                </div>
-                <div>
-                    <label for="telefon">Telefon</label>
-                    <input type="tel" id="telefon" name="telefon" required class="w-full p-2 border rounded">
-                </div>
+              <div>
+                <label class="block mb-2">Jméno</label>
+                <input type="text" name="jmeno" required class="w-full p-2 border rounded">
+              </div>
+              <div>
+                <label class="block mb-2">Příjmení</label>
+                <input type="text" name="prijmeni" required class="w-full p-2 border rounded">
+              </div>
+              <div>
+                <label class="block mb-2">Email</label>
+                <input type="email" name="email" required class="w-full p-2 border rounded">
+              </div>
+              <div>
+                <label class="block mb-2">Telefon</label>
+                <input type="tel" name="telefon" required class="w-full p-2 border rounded">
+              </div>
             </div>
-
+          
             <div class="mb-4">
                 <label for="autoComplete">Adresa</label>
                 <div class="autoComplete_wrapper">
                     <input id="autoComplete" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" class="w-full p-2 border rounded">
                 </div>
             </div>
-
+          
             <div class="mb-4">
-                <label for="popis">Popis problému</label>
-                <textarea id="popis" name="popis" rows="4" class="w-full p-2 border rounded"></textarea>
+              <label class="block mb-2">Popis problému</label>
+              <textarea name="popisProblemu" required class="w-full p-2 border rounded"></textarea>
             </div>
-
+          
             <div class="mb-4">
-                <label for="datum">Výběr termínu</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                        </svg>
-                    </div>
-                    <input type="date" id="datum" name="datum" class="w-full p-2 pl-10 border rounded">
-                </div>
+              <label class="block mb-2">Výběr termínu</label>
+              <input type="date" name="datumTerminu" required class="w-full p-2 border rounded">
             </div>
-
+          
             <div class="mb-4">
-                <label for="casoveOkno">Výběr časového okna</label>
-                <select id="casoveOkno" name="casoveOkno" class="w-full p-2 border rounded">
-                    <option value="">Vyberte časové okno</option>
-                    <option value="9:00-18:00">9:00-18:00</option>
-                    <option value="18:00-20:00">18:00-20:00</option>
-                    <option value="20:00-23:59">20:00-23:59</option>
-                </select>
+              <label class="block mb-2">Výběr časového okna</label>
+              <select name="casoveOkno" required class="w-full p-2 border rounded">
+                <option value="">Vyberte časové okno</option>
+                <option value="9:00-18:00">9:00-18:00</option>
+                <option value="18:00-20:00">18:00-20:00</option>
+                <option value="20:00-23:59">20:00-23:59</option>
+              </select>
             </div>
-
-            <button type="submit" id="submitButton" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Pokračovat</button>
-        </form>
+          
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Odeslat</button>
+          </form>
     </div>
 
     <div id="orderConfirmation" class="hidden bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto mt-8">
@@ -120,7 +118,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
 
-    <script src="autoComplete.js"></script>
-    <script src="payment.js"></script>
+    <script src="./script/autoComplete.js"></script>
+    <!-- <script src="./script/aresApi.js"></script> -->
+    <script src="./script/payment.js"></script>
 </body>
 </html>
