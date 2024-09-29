@@ -1,6 +1,8 @@
 const API_BASE_URL = 'https://api.invoicing.co/api/v1';
 const API_KEY_NJ = 'zkqqUnm4u1I6RM22Klkf731Y668SWVkry1RrU5q8i2i32lcdlcEx4Tr9r7txCjud';
 
+const ECOMAIL_API_KEY = '1a01940cbe7689a1725cc0f5f4d3cb02eb5509e8acba75f7cd0e9d411cf1a912'; // Nahraďte svým skutečným Ecomail API klíčem
+const ECOMAIL_LIST_ID = 'test'; // Nahraďte ID svého Ecomail listu
 async function createOrGetClient(clientData) {
   try {
     const searchResponse = await fetch(`${API_BASE_URL}/clients?email=${clientData.email}`, {
@@ -96,6 +98,8 @@ async function processCustomerRequest(formData) {
       datumTerminu: formData.datumTerminu,
       casoveOkno: formData.casoveOkno
     });
+    //ECOMAIL
+    await addUserToEcomailList(formData);
 
     console.log("Request processed successfully");
 
@@ -106,6 +110,39 @@ async function processCustomerRequest(formData) {
     };
   } catch (error) {
     console.error('Error in processCustomerRequest:', error);
+    throw error;
+  }
+}
+
+async function addUserToEcomailList(userData) {
+  try {
+    const response = await fetch(`https://api2.ecomailapp.cz/lists/${ECOMAIL_LIST_ID}/subscribe`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'key': ECOMAIL_API_KEY
+      },
+      body: JSON.stringify({
+        subscriber_data: {
+          email: userData.email,
+          name: userData.jmeno,
+          surname: userData.lastname,
+          phone: userData.phone,
+        },
+        resubscribe: true,
+        update_existing: true
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log('User added to Ecomail list:', result);
+    return result;
+  } catch (error) {
+    console.error('Error adding user to Ecomail list:', error);
     throw error;
   }
 }
