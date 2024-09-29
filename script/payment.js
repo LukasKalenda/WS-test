@@ -98,8 +98,22 @@ async function processCustomerRequest(formData) {
       datumTerminu: formData.datumTerminu,
       casoveOkno: formData.casoveOkno
     });
-    //ECOMAIL
+
+    // Přidáme uživatele do Ecomail listu
     await addUserToEcomailList(formData);
+
+    // Uložíme data do naší databáze
+    const response = await fetch('http://localhost:3000/api/customers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Chyba při ukládání do databáze');
+    }
 
     console.log("Request processed successfully");
 
