@@ -1,9 +1,3 @@
-//TODO
-/*
-1) Spojení s ecomail
-2) Změna hostitele
-*/
-
 const API_BASE_URL = 'https://api.invoicing.co/api/v1';
 const API_KEY_NJ = 'zkqqUnm4u1I6RM22Klkf731Y668SWVkry1RrU5q8i2i32lcdlcEx4Tr9r7txCjud';
 
@@ -27,13 +21,13 @@ async function createOrGetClient(clientData) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          name: `${clientData.jmeno} ${clientData.prijmeni}`,
-          contacts: {
+          name: `${clientData.jmeno} ${clientData.lastname}`,
+          contacts: [{
             email: clientData.email,
-            phone: clientData.telefon
-          },
+            phone: clientData.phone
+          }],
           address1: clientData.adresa,
-          number: clientData.typZakaznika === 'firma' ? clientData.ic : ''
+          number: clientData.customerType === 'firma' ? clientData.ic : ''
         })
       });
       return await createResponse.json();
@@ -54,7 +48,11 @@ async function createProject(projectData) {
       },
       body: JSON.stringify({
         name: `Oprava - ${projectData.popisProblemu.substring(0, 50)}...`,
-        client_id: projectData.clientId
+        client_id: projectData.clientId,
+        task_rate: 0,
+        budgeted_hours: 0,
+        is_deleted: false,
+        color: "blue"
       })
     });
     return await response.json();
@@ -99,28 +97,12 @@ async function processCustomerRequest(formData) {
       casoveOkno: formData.casoveOkno
     });
 
-    const docRef = await addDoc(collection(db, "repairs"), {
-      clientName: `${formData.jmeno} ${formData.prijmeni}`,
-      email: formData.email,
-      phone: formData.telefon,
-      address: formData.adresa,
-      problem: formData.popisProblemu,
-      date: formData.datumTerminu,
-      timeWindow: formData.casoveOkno,
-      createdAt: new Date(),
-      status: "nový",
-      clientId: client.id,
-      projectId: project.id,
-      taskId: task.id
-    });
-
-    console.log("Document written with ID: ", docRef.id);
+    console.log("Request processed successfully");
 
     return {
       client: client,
       project: project,
-      task: task,
-      firestoreId: docRef.id
+      task: task
     };
   } catch (error) {
     console.error('Error in processCustomerRequest:', error);
@@ -133,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const firmaPole = document.getElementById('firmaPole');
 
   // Show/hide company field based on customer type
-  document.querySelectorAll('input[name="typZakaznika"]').forEach((radio) => {
+  document.querySelectorAll('input[name="customerType"]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
       if (e.target.value === 'firma') {
         firmaPole.classList.remove('hidden');
