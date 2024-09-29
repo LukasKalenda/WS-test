@@ -113,6 +113,12 @@ async function processCustomerRequest(formData) {
 document.addEventListener('DOMContentLoaded', () => {
   const customerForm = document.getElementById('customerForm');
   const firmaPole = document.getElementById('firmaPole');
+  const customerInfoSection = document.getElementById('customerInfoSection');
+  const termsSection = document.getElementById('termsSection');
+  const showTermsButton = document.getElementById('showTermsButton');
+  const backButton = document.getElementById('backButton');
+  const confirmButton = document.getElementById('confirmButton');
+  const orderConfirmation = document.getElementById('orderConfirmation');
 
   // Show/hide company field based on customer type
   document.querySelectorAll('input[name="customerType"]').forEach((radio) => {
@@ -125,6 +131,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Show terms section
+  showTermsButton.addEventListener('click', () => {
+    customerInfoSection.classList.add('hidden');
+    termsSection.classList.remove('hidden');
+  });
+
+  // Go back to customer info section
+  backButton.addEventListener('click', () => {
+    termsSection.classList.add('hidden');
+    customerInfoSection.classList.remove('hidden');
+  });
+
+  // Enable/disable confirm button based on terms acceptance
+  const termsCheckboxes = document.querySelectorAll('input[name="terms"]');
+  termsCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      const allChecked = Array.from(termsCheckboxes).every(cb => cb.checked);
+      confirmButton.disabled = !allChecked;
+    });
+  });
+
   customerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -134,8 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const result = await processCustomerRequest(formDataObject);
       console.log('Request processed successfully:', result);
       // Show order confirmation
-      document.getElementById('orderConfirmation').classList.remove('hidden');
-      customerForm.classList.add('hidden');
+      termsSection.classList.add('hidden');
+      orderConfirmation.classList.remove('hidden');
+      // You can populate orderSummary here if needed
+      document.getElementById('orderSummary').textContent = 'Vaše objednávka byla úspěšně zpracována.';
     } catch (error) {
       console.error('Failed to process request:', error);
       alert('Došlo k chybě při zpracování požadavku. Zkuste to prosím znovu.');
