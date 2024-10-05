@@ -14,7 +14,7 @@
     <form id="customerForm" class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
       <div id="customerInfoSection">
         <h1 class="text-2xl font-bold mb-6 text-center">Formulář pro zákazníky</h1>
-    
+
         <div class="mb-6">
           <label class="block mb-2">Typ zákazníka</label>
           <div class="flex space-x-4">
@@ -26,12 +26,12 @@
             </label>
           </div>
         </div>
-    
+
         <div id="firmaPole" class="hidden mb-4">
           <label class="block mb-2">IČ</label>
           <input type="text" name="ic" class="w-full p-2 border rounded">
         </div>
-    
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label class="block mb-2">Jméno</label>
@@ -50,24 +50,25 @@
             <input type="tel" name="phone" required class="w-full p-2 border rounded">
           </div>
         </div>
-    
+
         <div class="mb-4">
           <label for="autoComplete">Adresa</label>
           <div class="autoComplete_wrapper">
-              <input id="autoComplete" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off" autocapitalize="off" class="w-full p-2 border rounded">
+            <input id="autoComplete" type="text" dir="ltr" spellcheck=false autocorrect="off" autocomplete="off"
+              autocapitalize="off" class="w-full p-2 border rounded">
           </div>
-      </div>
-    
+        </div>
+
         <div class="mb-4">
           <label class="block mb-2">Popis problému</label>
           <textarea name="popisProblemu" required class="w-full p-2 border rounded"></textarea>
         </div>
-    
+
         <div class="mb-4">
           <label class="block mb-2">Výběr termínu</label>
           <input type="date" name="datumTerminu" required class="w-full p-2 border rounded">
         </div>
-    
+
         <div class="mb-4">
           <label class="block mb-2">Výběr časového okna</label>
           <select name="casoveOkno" required class="w-full p-2 border rounded">
@@ -77,42 +78,50 @@
             <option value="20:00-23:59">20:00-23:59</option>
           </select>
         </div>
-    
-        <button type="button" id="showTermsButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Odeslat</button>
+
+        <button type="button" id="showTermsButton"
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Pokračovat</button>
       </div>
-    
+
       <div id="termsSection" class="hidden">
         <h2 class="text-2xl font-bold mb-6 text-center">Smluvní podmínky</h2>
         <div class="mb-6">
           <div class="mb-4">
             <label>
               <input type="checkbox" name="terms" required>
-              <span class="ml-2">Souhlasím se zasíláním <a href="https://it-doma.cz/souhlas-se-zasilanim-obchodnich-sdeleni/" class="text-blue-500" target="_blank">obchodních sdělení</a></span>
+              <span class="ml-2">Souhlasím se zasíláním <a
+                  href="https://it-doma.cz/souhlas-se-zasilanim-obchodnich-sdeleni/" class="text-blue-500"
+                  target="_blank">obchodních sdělení</a></span>
             </label>
           </div>
           <div class="mb-4">
             <label>
               <input type="checkbox" name="terms" required>
-              <span class="ml-2">Souhlasím s <a href="https://it-doma.cz/obchodni-podminky" class="text-blue-500" target="_blank">obchodními podmínkami</a></span>
+              <span class="ml-2">Souhlasím s <a href="https://it-doma.cz/obchodni-podminky" class="text-blue-500"
+                  target="_blank">obchodními podmínkami</a></span>
             </label>
           </div>
           <div class="mb-4">
             <label>
               <input type="checkbox" name="terms" required>
-              <span class="ml-2">Souhlasím s uchováním a <a href="https://it-doma.cz/zasady-zpracovani-osobnich-udaju/" class="text-blue-500" target="_blank">zpracováním osobních údajů</a></span>
+              <span class="ml-2">Souhlasím s uchováním a <a href="https://it-doma.cz/zasady-zpracovani-osobnich-udaju/"
+                  class="text-blue-500" target="_blank">zpracováním osobních údajů</a></span>
             </label>
           </div>
         </div>
-        <div>
-          <p>Bude Vám stržena záloha 200 Kč. Platební odkaz přijde do Vaší e-mail adresy.</p>
-        </div>
+        <ul class="list-disc border-dotted border-2 bg-indigo-200 border-indigo-500 rounded-lg p-5">
+          <li class="">Bude Vám stržena záloha 200 Kč.</li>
+          <li class="">Platební odkaz přijde do Vaší e-mail adresy.</li>
+        </ul>
         <div class="flex justify-between mt-4">
-          <button type="button" id="backButton" class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Zpět</button>
-          <button type="submit" id="confirmButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" disabled>Potvrdit a zaplatit</button>
+          <button type="button" id="backButton"
+            class="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">Zpět</button>
+          <button type="submit" id="confirmButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            disabled>Potvrdit a zaplatit</button>
         </div>
       </div>
     </form>
-    
+
     <div id="orderConfirmation" class="hidden bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto mt-8">
       <h2 class="text-2xl font-bold mb-6 text-center">Potvrzení objednávky</h2>
       <div id="orderSummary" class="mb-6"></div>

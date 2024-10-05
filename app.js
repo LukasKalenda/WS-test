@@ -1,8 +1,6 @@
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
 const app = express();
 const pool = new Pool({
@@ -12,37 +10,18 @@ const pool = new Pool({
 app.use(cors());
 app.use(express.json());
 
-// const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';  // DEV Version
-
-const JWT_SECRET = process.env.JWT_SECRET;
-// Middleware pro ověření JWT
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (token == null) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
-
-// Login endpoint
-app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
-  
+// Jednoduchá autentizace pro admin
+const adminAuth = (req, res, next) => {
+  const { username, password } = req.headers;
   if (username === 'admin' && password === 'password') {
-    const token = jwt.sign({ username: username }, JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
+    next();
   } else {
     res.status(401).json({ error: 'Neplatné přihlašovací údaje' });
   }
-});
+};
 
 // Získat všechny zákazníky
-app.get('/api/customers', authenticateToken, async (req, res) => {
+app.get('/api/customers', adminAuth, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM customers ORDER BY created_at DESC');
     res.json(rows);
@@ -52,7 +31,7 @@ app.get('/api/customers', authenticateToken, async (req, res) => {
 });
 
 // Získat jednoho zákazníka
-app.get('/api/customers/:id', authenticateToken, async (req, res) => {
+app.get('/api/customers/:id', adminAuth, async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM customers WHERE id = $1', [req.params.id]);
     if (rows.length === 0) {
@@ -65,7 +44,7 @@ app.get('/api/customers/:id', authenticateToken, async (req, res) => {
 });
 
 // Vytvořit nového zákazníka
-app.post('/api/customers', authenticateToken, async (req, res) => {
+app.post('/api/customers', async (req, res) => {
   const { customer_type, ic, jmeno, prijmeni, email, telefon, adresa, popis_problemu, datum_terminu, casove_okno } = req.body;
   try {
     const { rows } = await pool.query(
@@ -79,7 +58,7 @@ app.post('/api/customers', authenticateToken, async (req, res) => {
 });
 
 // Aktualizovat zákazníka
-app.put('/api/customers/:id', authenticateToken, async (req, res) => {
+app.put('/api/customers/:id', adminAuth, async (req, res) => {
   const { customer_type, ic, jmeno, prijmeni, email, telefon, adresa, popis_problemu, datum_terminu, casove_okno } = req.body;
   try {
     const { rows } = await pool.query(
@@ -96,7 +75,7 @@ app.put('/api/customers/:id', authenticateToken, async (req, res) => {
 });
 
 // Smazat zákazníka
-app.delete('/api/customers/:id', authenticateToken, async (req, res) => {
+app.delete('/api/customers/:id', adminAuth, async (req, res) => {
   try {
     const { rows } = await pool.query('DELETE FROM customers WHERE id = $1 RETURNING *', [req.params.id]);
     if (rows.length === 0) {

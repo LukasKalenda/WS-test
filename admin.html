@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Správa zákazníků</title>
+    <title>Admin - Správa zákazníků</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
@@ -19,113 +19,68 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000/api'; //Doplnit
-        let token = localStorage.getItem('token');
+        const API_URL = 'http://localhost:3000/api';
+        let username, password;
 
         async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
+            username = document.getElementById('username').value;
+            password = document.getElementById('password').value;
             try {
-                const response = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    token = data.token;
-                    localStorage.setItem('token', token);
-                    document.getElementById('loginForm').classList.add('hidden');
-                    fetchCustomers();
-                } else {
-                    alert('Neplatné přihlašovací údaje');
-                }
+                await fetchCustomers();
+                document.getElementById('loginForm').classList.add('hidden');
             } catch (error) {
-                console.error('Chyba při přihlašování:', error);
-                alert('Chyba při přihlašování');
+                alert('Neplatné přihlašovací údaje');
             }
         }
 
         async function fetchCustomers() {
-            if (!token) {
-                document.getElementById('loginForm').classList.remove('hidden');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_URL}/customers`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    const customers = await response.json();
-                    const customerList = document.getElementById('customerList');
-                    customerList.innerHTML = customers.map(customer => `
-                        <div class="bg-white p-2 mb-2 rounded shadow">
-                            ${customer.jmeno} ${customer.prijmeni} - ${customer.email}
-                            <button onclick="editCustomer(${customer.id})" class="bg-blue-500 text-white px-2 py-1 rounded ml-2">Upravit</button>
-                            <button onclick="deleteCustomer(${customer.id})" class="bg-red-500 text-white px-2 py-1 rounded ml-2">Smazat</button>
-                        </div>
-                    `).join('');
-                    customerList.classList.remove('hidden');
-                } else if (response.status === 401) {
-                    token = null;
-                    localStorage.removeItem('token');
-                    document.getElementById('loginForm').classList.remove('hidden');
-                    document.getElementById('customerList').classList.add('hidden');
+            const response = await fetch(`${API_URL}/customers`, {
+                headers: {
+                    'username': username,
+                    'password': password
                 }
-            } catch (error) {
-                console.error('Chyba při načítání zákazníků:', error);
-            }
+            });
+            if (!response.ok) throw new Error('Neplatné přihlašovací údaje');
+            const customers = await response.json();
+            const customerList = document.getElementById('customerList');
+            customerList.innerHTML = customers.map(customer => `
+                <div class="bg-white p-2 mb-2 rounded shadow">
+                    ${customer.jmeno} ${customer.prijmeni} - ${customer.email}
+                    <button onclick="editCustomer(${customer.id})" class="bg-blue-500 text-white px-2 py-1 rounded ml-2">Upravit</button>
+                    <button onclick="deleteCustomer(${customer.id})" class="bg-red-500 text-white px-2 py-1 rounded ml-2">Smazat</button>
+                </div>
+            `).join('');
+            customerList.classList.remove('hidden');
         }
 
         async function editCustomer(id) {
-            try {
-                const response = await fetch(`${API_URL}/customers/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (response.ok) {
-                    const customer = await response.json();
-                    const editForm = document.getElementById('editForm');
-                    editForm.innerHTML = `
-                        <h2 class="text-xl font-bold mb-2">Upravit zákazníka</h2>
-                        <form onsubmit="updateCustomer(event, ${id})">
-                            <div class="mb-2">
-                                <label class="block">Jméno:</label>
-                                <input type="text" name="jmeno" value="${customer.jmeno}" required class="w-full p-1 border rounded">
-                            </div>
-                            <div class="mb-2">
-                                <label class="block">Příjmení:</label>
-                                <input type="text" name="prijmeni" value="${customer.prijmeni}" required class="w-full p-1 border rounded">
-                            </div>
-                            <div class="mb-2">
-                                <label class="block">Email:</label>
-                                <input type="email" name="email" value="${customer.email}" required class="w-full p-1 border rounded">
-                            </div>
-                            <div class="mb-2">
-                                <label class="block">Telefon:</label>
-                                <input type="tel" name="telefon" value="${customer.telefon}" required class="w-full p-1 border rounded">
-                            </div>
-                            <div class="mb-2">
-                                <label class="block">Adresa:</label>
-                                <textarea name="adresa" required class="w-full p-1 border rounded">${customer.adresa}</textarea>
-                            </div>
-                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Uložit změny</button>
-                        </form>
-                    `;
-                    editForm.classList.remove('hidden');
+            const response = await fetch(`${API_URL}/customers/${id}`, {
+                headers: {
+                    'username': username,
+                    'password': password
                 }
-            } catch (error) {
-                console.error('Chyba při načítání zákazníka:', error);
-            }
+            });
+            const customer = await response.json();
+            const editForm = document.getElementById('editForm');
+            editForm.innerHTML = `
+                <h2 class="text-xl font-bold mb-2">Upravit zákazníka</h2>
+                <form onsubmit="updateCustomer(event, ${id})">
+                    <div class="mb-2">
+                        <label class="block">Jméno:</label>
+                        <input type="text" name="jmeno" value="${customer.jmeno}" required class="w-full p-1 border rounded">
+                    </div>
+                    <div class="mb-2">
+                        <label class="block">Příjmení:</label>
+                        <input type="text" name="prijmeni" value="${customer.prijmeni}" required class="w-full p-1 border rounded">
+                    </div>
+                    <div class="mb-2">
+                        <label class="block">Email:</label>
+                        <input type="email" name="email" value="${customer.email}" required class="w-full p-1 border rounded">
+                    </div>
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Uložit změny</button>
+                </form>
+            `;
+            editForm.classList.remove('hidden');
         }
 
         async function updateCustomer(event, id) {
@@ -133,55 +88,40 @@
             const formData = new FormData(event.target);
             const customerData = Object.fromEntries(formData.entries());
             
-            try {
-                const response = await fetch(`${API_URL}/customers/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(customerData),
-                });
+            const response = await fetch(`${API_URL}/customers/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'username': username,
+                    'password': password
+                },
+                body: JSON.stringify(customerData),
+            });
 
-                if (response.ok) {
-                    fetchCustomers();
-                    document.getElementById('editForm').classList.add('hidden');
-                } else {
-                    alert('Chyba při aktualizaci zákazníka');
-                }
-            } catch (error) {
-                console.error('Chyba při aktualizaci zákazníka:', error);
+            if (response.ok) {
+                fetchCustomers();
+                document.getElementById('editForm').classList.add('hidden');
+            } else {
                 alert('Chyba při aktualizaci zákazníka');
             }
         }
 
         async function deleteCustomer(id) {
             if (confirm('Opravdu chcete smazat tohoto zákazníka?')) {
-                try {
-                    const response = await fetch(`${API_URL}/customers/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (response.ok) {
-                        fetchCustomers();
-                    } else {
-                        alert('Chyba při mazání zákazníka');
+                const response = await fetch(`${API_URL}/customers/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'username': username,
+                        'password': password
                     }
-                } catch (error) {
-                    console.error('Chyba při mazání zákazníka:', error);
+                });
+
+                if (response.ok) {
+                    fetchCustomers();
+                } else {
                     alert('Chyba při mazání zákazníka');
                 }
             }
-        }
-
-        // Kontrola, zda je uživatel přihlášen při načtení stránky
-        if (token) {
-            fetchCustomers();
-        } else {
-            document.getElementById('loginForm').classList.remove('hidden');
         }
     </script>
 </body>
